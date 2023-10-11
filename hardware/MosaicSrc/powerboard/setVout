@@ -1,0 +1,11 @@
+set V=1.65
+
+./pbctrl -state 192.168.168.250
+
+foreach i (0 1 2 3 4 5 6 7)
+	./pbctrl -Vout $i $V 192.168.168.250
+end
+
+./pbctrl -state 192.168.168.250
+./pbctrl -storeall 192.168.168.250
+

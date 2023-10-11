@@ -1,0 +1,4 @@
+*.o
+pbGUI
+*.pro.user
+Makefile

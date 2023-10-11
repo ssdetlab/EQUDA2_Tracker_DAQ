@@ -1,0 +1,191 @@
+
+*** LogCollector started at 1697028289 ***
+[0m[1m[2023-10-11 15:44:49.550] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Receive an INI section
+    <Configuration>
+      <Section title="">
+        <EUDAQ_LOG_ADDR>tcp://127.0.0.1:43609</EUDAQ_LOG_ADDR>
+        <Name>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/Tracker.ini</Name>
+      </Section>
+    </Configuration>
+
+[0m[1m[2023-10-11 15:44:49.550] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is to be initialised...
+[0m[1m[2023-10-11 15:44:49.550] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is initialised.
+[0m[1m[2023-10-11 15:44:51.329] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing Configure command
+[0m[1m[2023-10-11 15:44:51.370] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Receive a CONF section
+    <Configuration>
+      <Section title="">
+        <LogCollector.log>tcp://127.0.0.1:43609</LogCollector.log>
+        <Name>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/MOSAIC_tests.conf</Name>
+      </Section>
+      <Section title="Producer.mosaic_0">
+        <CTRL_AF_THR>1250000</CTRL_AF_THR>
+        <CTRL_IFC_PHASE>2</CTRL_IFC_PHASE>
+        <CTRL_LATENCY_MODE>0</CTRL_LATENCY_MODE>
+        <CTRL_TIMEOUT>0</CTRL_TIMEOUT>
+        <DATA_LINK_POLARITY>0</DATA_LINK_POLARITY>
+        <DATA_LINK_SPEED>0</DATA_LINK_SPEED>
+        <DATA_LOG_DIR>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/ev_data/mosaic_test_data/</DATA_LOG_DIR>
+        <EUDAQ_DC>my_dc</EUDAQ_DC>
+        <EV_DELAY>100</EV_DELAY>
+        <EV_SIZE>128</EV_SIZE>
+        <EXT_TRG_SRC>0</EXT_TRG_SRC>
+        <GENERATOR>1</GENERATOR>
+        <IP_ADDRESS>192.168.168.250</IP_ADDRESS>
+        <MANCHESTER_DISABLED>0</MANCHESTER_DISABLED>
+        <MASTER_SLAVE>0</MASTER_SLAVE>
+        <MOSAIC_ID>0</MOSAIC_ID>
+        <NOF_CTRL_IFC>12</NOF_CTRL_IFC>
+        <N_TRIG>1</N_TRIG>
+        <POLLING_DATA_TIMEOUT>500</POLLING_DATA_TIMEOUT>
+        <PULSE_DELAY>10000</PULSE_DELAY>
+        <TCP_PORT_ADDR>2000</TCP_PORT_ADDR>
+        <TRIG_DELAY>0</TRIG_DELAY>
+      </Section>
+    </Configuration>
+
+[0m[1m[2023-10-11 15:44:51.370] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is to be configured...
+[0m[1m[2023-10-11 15:44:51.417] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is configured.
+[0m[1m[2023-10-11 15:44:53.411] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StartRun command for RUN #821
+[0m[1m[2023-10-11 15:44:55.512] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #821 is to be started...
+[0m[1m[2023-10-11 15:44:55.512] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #821 is started.
+[0m[1m[2023-10-11 15:44:55.618] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]1
+[0m[1m[2023-10-11 15:45:15.621] [0m[33;1m(WARN)[0m [Producer.mosaic_0 ]CommandReceiver: User's RunLoop exits during the running (20 seconds ago)
+[0m[1m[2023-10-11 15:52:32.831] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StopRun command for RUN #821
+[0m[1m[2023-10-11 15:52:32.831] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #821 is to be stopped...
+[0m[1m[2023-10-11 15:52:33.201] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #821 is stopped.
+[0m[1m[2023-10-11 15:52:38.511] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing Configure command
+[0m[1m[2023-10-11 15:52:38.552] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Receive a CONF section
+    <Configuration>
+      <Section title="">
+        <LogCollector.log>tcp://127.0.0.1:43609</LogCollector.log>
+        <Name>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/MOSAIC_tests.conf</Name>
+      </Section>
+      <Section title="Producer.mosaic_0">
+        <CTRL_AF_THR>1250000</CTRL_AF_THR>
+        <CTRL_IFC_PHASE>2</CTRL_IFC_PHASE>
+        <CTRL_LATENCY_MODE>0</CTRL_LATENCY_MODE>
+        <CTRL_TIMEOUT>0</CTRL_TIMEOUT>
+        <DATA_LINK_POLARITY>0</DATA_LINK_POLARITY>
+        <DATA_LINK_SPEED>0</DATA_LINK_SPEED>
+        <DATA_LOG_DIR>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/ev_data/mosaic_test_data/</DATA_LOG_DIR>
+        <EUDAQ_DC>my_dc</EUDAQ_DC>
+        <EV_DELAY>100</EV_DELAY>
+        <EV_SIZE>128</EV_SIZE>
+        <EXT_TRG_SRC>0</EXT_TRG_SRC>
+        <GENERATOR>1</GENERATOR>
+        <IP_ADDRESS>192.168.168.250</IP_ADDRESS>
+        <MANCHESTER_DISABLED>0</MANCHESTER_DISABLED>
+        <MASTER_SLAVE>0</MASTER_SLAVE>
+        <MOSAIC_ID>0</MOSAIC_ID>
+        <NOF_CTRL_IFC>12</NOF_CTRL_IFC>
+        <N_TRIG>3</N_TRIG>
+        <POLLING_DATA_TIMEOUT>500</POLLING_DATA_TIMEOUT>
+        <PULSE_DELAY>10000</PULSE_DELAY>
+        <TCP_PORT_ADDR>2000</TCP_PORT_ADDR>
+        <TRIG_DELAY>0</TRIG_DELAY>
+      </Section>
+    </Configuration>
+
+[0m[1m[2023-10-11 15:52:38.552] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is to be configured...
+[0m[1m[2023-10-11 15:52:38.600] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is configured.
+[0m[1m[2023-10-11 15:52:39.858] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StartRun command for RUN #822
+[0m[1m[2023-10-11 15:52:41.958] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #822 is to be started...
+[0m[1m[2023-10-11 15:52:41.959] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #822 is started.
+[0m[1m[2023-10-11 15:52:42.064] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]1
+[0m[1m[2023-10-11 15:52:42.064] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]2
+[0m[1m[2023-10-11 15:52:42.065] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]3
+[0m[1m[2023-10-11 15:53:02.068] [0m[33;1m(WARN)[0m [Producer.mosaic_0 ]CommandReceiver: User's RunLoop exits during the running (20 seconds ago)
+[0m[1m[2023-10-11 15:57:52.324] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StopRun command for RUN #822
+[0m[1m[2023-10-11 15:57:52.324] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #822 is to be stopped...
+[0m[1m[2023-10-11 15:57:52.622] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #822 is stopped.
+[0m[1m[2023-10-11 15:57:54.799] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing Configure command
+[0m[1m[2023-10-11 15:57:54.840] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Receive a CONF section
+    <Configuration>
+      <Section title="">
+        <LogCollector.log>tcp://127.0.0.1:43609</LogCollector.log>
+        <Name>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/MOSAIC_tests.conf</Name>
+      </Section>
+      <Section title="Producer.mosaic_0">
+        <CTRL_AF_THR>1250000</CTRL_AF_THR>
+        <CTRL_IFC_PHASE>2</CTRL_IFC_PHASE>
+        <CTRL_LATENCY_MODE>0</CTRL_LATENCY_MODE>
+        <CTRL_TIMEOUT>0</CTRL_TIMEOUT>
+        <DATA_LINK_POLARITY>0</DATA_LINK_POLARITY>
+        <DATA_LINK_SPEED>0</DATA_LINK_SPEED>
+        <DATA_LOG_DIR>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/ev_data/mosaic_test_data/</DATA_LOG_DIR>
+        <EUDAQ_DC>my_dc</EUDAQ_DC>
+        <EV_DELAY>100</EV_DELAY>
+        <EV_SIZE>1</EV_SIZE>
+        <EXT_TRG_SRC>0</EXT_TRG_SRC>
+        <GENERATOR>1</GENERATOR>
+        <IP_ADDRESS>192.168.168.250</IP_ADDRESS>
+        <MANCHESTER_DISABLED>0</MANCHESTER_DISABLED>
+        <MASTER_SLAVE>0</MASTER_SLAVE>
+        <MOSAIC_ID>0</MOSAIC_ID>
+        <NOF_CTRL_IFC>12</NOF_CTRL_IFC>
+        <N_TRIG>3</N_TRIG>
+        <POLLING_DATA_TIMEOUT>500</POLLING_DATA_TIMEOUT>
+        <PULSE_DELAY>10000</PULSE_DELAY>
+        <TCP_PORT_ADDR>2000</TCP_PORT_ADDR>
+        <TRIG_DELAY>0</TRIG_DELAY>
+      </Section>
+    </Configuration>
+
+[0m[1m[2023-10-11 15:57:54.840] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is to be configured...
+[0m[1m[2023-10-11 15:57:54.888] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is configured.
+[0m[1m[2023-10-11 15:57:56.341] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StartRun command for RUN #823
+[0m[1m[2023-10-11 15:57:58.442] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #823 is to be started...
+[0m[1m[2023-10-11 15:57:58.443] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #823 is started.
+[0m[1m[2023-10-11 15:57:58.548] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]1
+[0m[1m[2023-10-11 15:57:58.548] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]2
+[0m[1m[2023-10-11 15:57:58.548] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]3
+[0m[1m[2023-10-11 15:58:18.552] [0m[33;1m(WARN)[0m [Producer.mosaic_0 ]CommandReceiver: User's RunLoop exits during the running (20 seconds ago)
+[0m[1m[2023-10-11 15:58:55.246] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StopRun command for RUN #823
+[0m[1m[2023-10-11 15:58:55.246] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #823 is to be stopped...
+[0m[1m[2023-10-11 15:58:55.559] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #823 is stopped.
+[0m[1m[2023-10-11 15:58:57.871] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing Configure command
+[0m[1m[2023-10-11 15:58:57.912] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Receive a CONF section
+    <Configuration>
+      <Section title="">
+        <LogCollector.log>tcp://127.0.0.1:43609</LogCollector.log>
+        <Name>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/MOSAIC_tests.conf</Name>
+      </Section>
+      <Section title="Producer.mosaic_0">
+        <CTRL_AF_THR>1250000</CTRL_AF_THR>
+        <CTRL_IFC_PHASE>2</CTRL_IFC_PHASE>
+        <CTRL_LATENCY_MODE>0</CTRL_LATENCY_MODE>
+        <CTRL_TIMEOUT>0</CTRL_TIMEOUT>
+        <DATA_LINK_POLARITY>0</DATA_LINK_POLARITY>
+        <DATA_LINK_SPEED>0</DATA_LINK_SPEED>
+        <DATA_LOG_DIR>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/ev_data/mosaic_test_data/</DATA_LOG_DIR>
+        <EUDAQ_DC>my_dc</EUDAQ_DC>
+        <EV_DELAY>100</EV_DELAY>
+        <EV_SIZE>2</EV_SIZE>
+        <EXT_TRG_SRC>0</EXT_TRG_SRC>
+        <GENERATOR>1</GENERATOR>
+        <IP_ADDRESS>192.168.168.250</IP_ADDRESS>
+        <MANCHESTER_DISABLED>0</MANCHESTER_DISABLED>
+        <MASTER_SLAVE>0</MASTER_SLAVE>
+        <MOSAIC_ID>0</MOSAIC_ID>
+        <NOF_CTRL_IFC>12</NOF_CTRL_IFC>
+        <N_TRIG>3</N_TRIG>
+        <POLLING_DATA_TIMEOUT>500</POLLING_DATA_TIMEOUT>
+        <PULSE_DELAY>10000</PULSE_DELAY>
+        <TCP_PORT_ADDR>2000</TCP_PORT_ADDR>
+        <TRIG_DELAY>0</TRIG_DELAY>
+      </Section>
+    </Configuration>
+
+[0m[1m[2023-10-11 15:58:57.912] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is to be configured...
+[0m[1m[2023-10-11 15:58:57.959] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is configured.
+[0m[1m[2023-10-11 15:59:00.556] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StartRun command for RUN #824
+[0m[1m[2023-10-11 15:59:02.657] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #824 is to be started...
+[0m[1m[2023-10-11 15:59:02.657] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #824 is started.
+[0m[1m[2023-10-11 15:59:02.763] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]1
+[0m[1m[2023-10-11 15:59:02.763] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]2
+[0m[1m[2023-10-11 15:59:02.763] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]3
+[0m[1m[2023-10-11 15:59:22.767] [0m[33;1m(WARN)[0m [Producer.mosaic_0 ]CommandReceiver: User's RunLoop exits during the running (20 seconds ago)
+[0m[1m[2023-10-11 16:07:34.154] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StopRun command for RUN #824
+[0m[1m[2023-10-11 16:07:34.154] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #824 is to be stopped...
+[0m[1m[2023-10-11 16:07:34.344] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #824 is stopped.
+[0m[1m[2023-10-11 16:07:39.656] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing Terminate command

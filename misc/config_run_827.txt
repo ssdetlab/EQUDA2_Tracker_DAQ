@@ -1,0 +1,48 @@
+[RunControl]
+ADDITIONAL_DISPLAY_NUMBERS = log,_SERVER
+
+[Producer.mosaic_0]
+IP_ADDRESS = 192.168.168.250
+TCP_PORT_ADDR = 2000
+PULSE_DELAY = 10000
+TRIG_DELAY = 0
+NOF_CTRL_IFC = 12
+CTRL_IFC_PHASE = 2
+CTRL_AF_THR = 1250000
+CTRL_LATENCY_MODE = 0
+CTRL_TIMEOUT = 0
+POLLING_DATA_TIMEOUT = 500
+DATA_LINK_POLARITY = 0
+DATA_LINK_SPEED = 0
+MANCHESTER_DISABLED = 0
+MASTER_SLAVE = 0
+
+EXT_TRG_SRC = 0
+
+GENERATOR = 1
+EV_SIZE = 2
+EV_DELAY = 100
+N_TRIG = 3
+
+DATA_LOG_DIR = /home/ssdetlab/stave_alpide/eudaq/user/stave/misc/ev_data/mosaic_test_data/
+
+MOSAIC_ID = 0
+EUDAQ_DC = my_dc
+
+[DataCollector.my_dc]
+EUDAQ_MN = my_mon
+EUDAQ_FW = native
+EUDAQ_FW_PATTERN = /home/ssdetlab/stave_alpide/eudaq/user/stave/misc/ev_data/$12D_run$6R$X
+EUDAQ_DATACOL_SEND_MONITOR_FRACTION = 1
+TTREE_DATA_PATH = /home/ssdetlab/stave_alpide/eudaq/user/stave/misc/ev_data/ttree_data/tree.root
+TTREE_NAME = MyTree
+BUF_SIZE = 32000
+SPLIT_LVL = 0
+ONLINE_MONITOR = 0
+NOF_STAVES = 1
+MIN_STAVES = 0
+MIN_EV_TO_DUMP = 10
+
+[Monitor.my_mon]
+NOF_STAVES = 1
+NOF_CHIPS_0 = 9

@@ -1,0 +1,82 @@
+
+*** LogCollector started at 1697030353 ***
+[0m[1m[2023-10-11 16:19:13.354] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Receive an INI section
+    <Configuration>
+      <Section title="">
+        <EUDAQ_LOG_ADDR>tcp://127.0.0.1:40467</EUDAQ_LOG_ADDR>
+        <Name>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/Tracker.ini</Name>
+      </Section>
+    </Configuration>
+
+[0m[1m[2023-10-11 16:19:13.355] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is to be initialised...
+[0m[1m[2023-10-11 16:19:13.355] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is initialised.
+[0m[1m[2023-10-11 16:19:21.546] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing Configure command
+[0m[1m[2023-10-11 16:19:21.546] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Receive a CONF section
+    <Configuration>
+      <Section title="">
+        <LogCollector.log>tcp://127.0.0.1:40467</LogCollector.log>
+        <Name>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/MOSAIC_tests.conf</Name>
+      </Section>
+      <Section title="Producer.mosaic_0">
+        <CTRL_AF_THR>1250000</CTRL_AF_THR>
+        <CTRL_IFC_PHASE>2</CTRL_IFC_PHASE>
+        <CTRL_LATENCY_MODE>0</CTRL_LATENCY_MODE>
+        <CTRL_TIMEOUT>0</CTRL_TIMEOUT>
+        <DATA_LINK_POLARITY>0</DATA_LINK_POLARITY>
+        <DATA_LINK_SPEED>0</DATA_LINK_SPEED>
+        <DATA_LOG_DIR>/home/ssdetlab/stave_alpide/eudaq/user/stave/misc/ev_data/mosaic_test_data/</DATA_LOG_DIR>
+        <EUDAQ_DC>my_dc</EUDAQ_DC>
+        <EV_DELAY>100</EV_DELAY>
+        <EV_SIZE>2</EV_SIZE>
+        <EXT_TRG_SRC>0</EXT_TRG_SRC>
+        <GENERATOR>1</GENERATOR>
+        <IP_ADDRESS>192.168.168.250</IP_ADDRESS>
+        <MANCHESTER_DISABLED>0</MANCHESTER_DISABLED>
+        <MASTER_SLAVE>0</MASTER_SLAVE>
+        <MOSAIC_ID>0</MOSAIC_ID>
+        <NOF_CTRL_IFC>12</NOF_CTRL_IFC>
+        <N_TRIG>10</N_TRIG>
+        <POLLING_DATA_TIMEOUT>500</POLLING_DATA_TIMEOUT>
+        <PULSE_DELAY>10000</PULSE_DELAY>
+        <TCP_PORT_ADDR>2000</TCP_PORT_ADDR>
+        <TRIG_DELAY>0</TRIG_DELAY>
+      </Section>
+    </Configuration>
+
+[0m[1m[2023-10-11 16:19:21.546] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is to be configured...
+[0m[1m[2023-10-11 16:19:21.592] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is configured.
+[0m[1m[2023-10-11 16:19:24.328] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StartRun command for RUN #828
+[0m[1m[2023-10-11 16:19:26.428] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #828 is to be started...
+[0m[1m[2023-10-11 16:19:26.428] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #828 is started.
+[0m[1m[2023-10-11 16:19:26.533] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]1
+[0m[1m[2023-10-11 16:19:26.533] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]2
+[0m[1m[2023-10-11 16:19:26.533] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]3
+[0m[1m[2023-10-11 16:19:26.533] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]4
+[0m[1m[2023-10-11 16:19:26.533] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]5
+[0m[1m[2023-10-11 16:19:26.533] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]6
+[0m[1m[2023-10-11 16:19:26.534] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]7
+[0m[1m[2023-10-11 16:19:26.534] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]8
+[0m[1m[2023-10-11 16:19:26.534] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]9
+[0m[1m[2023-10-11 16:19:26.534] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]10
+[0m[1m[2023-10-11 16:19:43.861] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StopRun command for RUN #828
+[0m[1m[2023-10-11 16:19:43.862] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #828 is to be stopped...
+[0m[1m[2023-10-11 16:19:44.037] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #828 is stopped.
+[0m[1m[2023-10-11 16:19:46.382] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StartRun command for RUN #829
+[0m[1m[2023-10-11 16:19:48.483] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #829 is to be started...
+[0m[1m[2023-10-11 16:19:48.483] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #829 is started.
+[0m[1m[2023-10-11 16:19:48.588] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]1
+[0m[1m[2023-10-11 16:19:48.588] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]2
+[0m[1m[2023-10-11 16:19:48.588] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]3
+[0m[1m[2023-10-11 16:19:48.588] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]4
+[0m[1m[2023-10-11 16:19:48.589] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]5
+[0m[1m[2023-10-11 16:19:48.589] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]6
+[0m[1m[2023-10-11 16:19:48.589] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]7
+[0m[1m[2023-10-11 16:19:48.589] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]8
+[0m[1m[2023-10-11 16:19:48.589] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]9
+[0m[1m[2023-10-11 16:19:48.589] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]10
+[0m[1m[2023-10-11 16:19:51.831] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing StopRun command for RUN #829
+[0m[1m[2023-10-11 16:19:51.831] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #829 is to be stopped...
+[0m[1m[2023-10-11 16:19:52.090] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]RUN #829 is stopped.
+[0m[1m[2023-10-11 16:19:55.616] [0m[32;1m(INFO)[0m [RunControl.RC-GUI ]Processing Terminate command
+[0m[1m[2023-10-11 16:19:55.616] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is to be terminated...
+[0m[1m[2023-10-11 16:19:55.616] [0m[32;1m(INFO)[0m [Producer.mosaic_0 ]Producer.mosaic_0 is terminated.
