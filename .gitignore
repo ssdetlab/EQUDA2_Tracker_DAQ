@@ -2,3 +2,4 @@ config_run*
 euLog*
 ev_data
 *.py
+CMake*
