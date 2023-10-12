@@ -80,7 +80,7 @@ void MOSAICProducer::DoConfigure(){
         data_gen->setup(gen_ev_size, gen_ev_del, false);
     }
 
-    data_log_path = conf->Get("DATA_LOG_DIR", "-1") + "run_" + std::to_string(MOSAICProducer::GetRunNumber()) + "_data_log.txt";
+    data_log_path = conf->Get("DATA_LOG_DIR", "-1");
 
     configured = true;
 }
@@ -88,7 +88,8 @@ void MOSAICProducer::DoConfigure(){
 void MOSAICProducer::RunLoop(){
     std::fstream fout;
     if(data_log_path != "-1"){
-        fout.open(data_log_path, std::ios_base::app);
+        std::string dlp = data_log_path + "run_" + std::to_string(MOSAICProducer::GetRunNumber()) + "_data_log.txt";
+        fout.open(dlp, std::ios_base::app);
     }
 
     /* Data Tacking */
