@@ -304,7 +304,6 @@ int TReadoutBoardMOSAIC::ReadEventData(int &nBytes, unsigned char *buffer)
     }
 
     if (gendata) {
-      std::cout << "HEREHEEREHERE" << std::endl;
       return (gendata->ReadEventData(nBytes, buffer));
     }
   }

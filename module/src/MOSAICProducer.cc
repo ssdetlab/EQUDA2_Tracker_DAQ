@@ -15,8 +15,6 @@ void MOSAICProducer::DoConfigure(){
     uint32_t b_us = 40;     // in 25ns units (40MHz)
     uint32_t b_ms = 40000;  // in 25ns units (40MHz)
 
-
-
     // in case it's a second CONFIG call
     if(this->configured) DoReset(); 
     

@@ -8,8 +8,6 @@
 #include "eudaq/Producer.hh"
 
 #include "TReadoutBoardMOSAIC.h"
-#include "TAlpide.h"
-#include "AlpideConfig.h"
 
 class MOSAICProducer : public eudaq::Producer{
   public:
@@ -45,9 +43,6 @@ class MOSAICProducer : public eudaq::Producer{
     int mosaic_id;
     
     std::string stats_dir;
-
-    // configuration methods
-    void readout_stave(int n_chips, std::map<int,std::vector<std::tuple<int,int>>> &return_hits);
 };
 
 namespace{
