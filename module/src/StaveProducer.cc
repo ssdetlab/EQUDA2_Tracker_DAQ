@@ -298,7 +298,7 @@ void StaveProducer::RunLoop(){
             // discard no data events
             // (MOSAIC header is 64 bytes + 1 for the trailer + 2
             // for EMPTY FRAME of ALPIDE)
-            if (res <= 0 || data_size_dummy <= 64 + 2 + 4 + 1) {
+            if (buffer[64] & 0xf0 == 0xe0) {
                 continue;
             }
             n_bytes_data.push_back(data_size_dummy);

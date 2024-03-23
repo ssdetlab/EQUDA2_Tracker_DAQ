@@ -37,9 +37,6 @@
 
 TAlpideDataParser::TAlpideDataParser() {}
 
-//
-// TODO: add TLU payload check
-//
 // fast parse of input frame
 // return the size of the data for the event pointed by dBuffer.
 long TAlpideDataParser::checkEvent(
@@ -74,7 +71,7 @@ long TAlpideDataParser::checkEvent(
                 // Check for the TLU payload
                 if ((*p & 0xff) == DCODE_TLU_HEADER && (*(p + 3) == DCODE_TLU_TRAILER)) {
                     p += 5; ///< take MOSAIC trailer into account
-            }
+                }
             }
             else if ((h >> DSHIFT_REGION_HEADER) == DCODE_REGION_HEADER) {
             }
