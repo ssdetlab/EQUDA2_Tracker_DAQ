@@ -296,8 +296,6 @@ void StaveProducer::RunLoop(){
             int data_size_dummy;
             int res = mosaic->ReadEventData(data_size_dummy, buffer);
             // discard no data events
-            // (MOSAIC header is 64 bytes + 1 for the trailer + 2
-            // for EMPTY FRAME of ALPIDE)
             if ((buffer[64] & 0xf0) == 0xe0) {
                 continue;
             }
@@ -315,6 +313,8 @@ void StaveProducer::RunLoop(){
         for(int i = 0; i < block.size()/MAX_EVENT_SIZE; i++){
             ev->SetTag("Event size " + std::to_string(i), n_bytes_data[i]);
         }
+        // This is a dummy trigger ID
+        // The true one comes from the TLU
         ev->SetTriggerN(trg_n);
         non_empty_frames++;
         trg_n++;
