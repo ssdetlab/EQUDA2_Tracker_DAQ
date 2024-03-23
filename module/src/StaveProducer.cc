@@ -299,7 +299,6 @@ void StaveProducer::RunLoop(){
             // (MOSAIC header is 64 bytes + 1 for the trailer + 2
             // for EMPTY FRAME of ALPIDE)
             if ((buffer[64] & 0xf0) == 0xe0) {
-                std::cout << "Empty " << std::hex << (std::uint16_t)(buffer[64] & 0xff) << std::endl;
                 continue;
             }
             n_bytes_data.push_back(data_size_dummy);
