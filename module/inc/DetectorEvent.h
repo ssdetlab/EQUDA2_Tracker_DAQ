@@ -6,112 +6,113 @@
 #include <tuple>
 #include <TObject.h>
 
-class chip_event{
-  public:
-    // hit map of the chip in the event
-    std::vector<std::tuple<int,int>> hits;
-
-    // ALPIDE readout flags
-    bool is_flushed_incomplete;
-    bool is_strobe_extended;
-    bool is_busy_transition;
-
-    // chip identificators
-    unsigned int chip_id;
-    unsigned int channel;
-
-    ClassDef(chip_event, 2);
-};
-
-class tlu_event{
-  public:
-    // fine trigger timestamp in 
-    // 1.5 ns units showing
-    // relative time of trigger
-    // arrival 
-    unsigned int fine_ts_0;
-    unsigned int fine_ts_1;
-    unsigned int fine_ts_2;
-    unsigned int fine_ts_3;
-    unsigned int fine_ts_4;
-    unsigned int fine_ts_5;
-
-    // number of triggers pre-veto (e.g. 
-    // counts triggers under DUT-asserted 
-    // busy)
-    unsigned int particles;
+class chip_event {
+    public:
+        // hit map of the chip in the event
+        std::vector<std::tuple<
+            std::uint16_t,std::uint16_t>> hits;
     
-    // event counnters in each trgger 
-    // input (above threshold but not 
-    // necessary unmasked)
-    unsigned int scaler_0;
-    unsigned int scaler_1;
-    unsigned int scaler_2;
-    unsigned int scaler_3;
-    unsigned int scaler_4;
-    unsigned int scaler_5;
-
-    // shows trigger inputs
-    // active in an event
-    std::string trg_sign;
-
-    // on of the following event types: 
-    // 0000 trigger internal; 0001 trigger external
-    // 0010 shutter falling;  0011 shutter rising
-    // 0100 edge falling;     0101 edge rising
-    // 0111 spill on;         0110 spill off
-    std::string type;
-
-    // event trigger id
-    unsigned int trg_n;
-
-    // event timestamp in ns
-    unsigned int event_begin;
-    unsigned int event_end;
-
-    ClassDef(tlu_event, 1);
-};
-
-class stave_event{
-  public:
-    // chip event storage
-    std::vector<chip_event> ch_ev_buffer;
-
-    // stave identificator
-    int stave_id;
-
-    // MOSAIC readout flags    
-    int  channel;
-    bool end_of_run;
-    bool overflow;
-
-    ClassDef(stave_event, 1);
-};
-
-class detector_event{
-  public:
-    // stave event storage
-    std::vector<stave_event> st_ev_buffer;
+        // ALPIDE readout flags
+        bool is_flushed_incomplete;
+        bool is_strobe_extended;
+        bool is_busy_transition;
     
-    // event time identificators  
-    unsigned int trg_n;
-    unsigned int event_begin;
-    unsigned int event_end;
-
-    ClassDef(detector_event, 2);
+        // chip identificators
+        std::uint8_t chip_id;
+        std::uint8_t channel;
+    
+        ClassDef(chip_event, 2);
 };
 
-class detector_event_tlu{
-  public:
-    // stave event storage
-    std::vector<stave_event> st_ev_buffer;
+class tlu_event {
+    public:
+        // fine trigger timestamp in 
+        // 1.5 ns units showing
+        // relative time of trigger
+        // arrival 
+        std::uint8_t fine_ts_0;
+        std::uint8_t fine_ts_1;
+        std::uint8_t fine_ts_2;
+        std::uint8_t fine_ts_3;
+        std::uint8_t fine_ts_4;
+        std::uint8_t fine_ts_5;
+    
+        // number of triggers pre-veto (e.g. 
+        // counts triggers under DUT-asserted 
+        // busy)
+        std::uint32_t particles;
+        
+        // event counnters in each trgger 
+        // input (above threshold but not 
+        // necessary unmasked)
+        std::uint32_t scaler_0;
+        std::uint32_t scaler_1;
+        std::uint32_t scaler_2;
+        std::uint32_t scaler_3;
+        std::uint32_t scaler_4;
+        std::uint32_t scaler_5;
+    
+        // shows trigger inputs
+        // active in an event
+        std::string trg_sign;
+    
+        // on of the following event types: 
+        // 0000 trigger internal; 0001 trigger external
+        // 0010 shutter falling;  0011 shutter rising
+        // 0100 edge falling;     0101 edge rising
+        // 0111 spill on;         0110 spill off
+        std::uint8_t type;
+    
+        // event trigger id
+        std::uint16_t trg_n;
+    
+        // event timestamp in ns
+        std::uint64_t event_begin;
+        std::uint64_t event_end;
+    
+        ClassDef(tlu_event, 1);
+};
 
-    // to sync with the tlu
-    tlu_event tl_ev;
+class stave_event {
+    public:
+        // chip event storage
+        std::vector<chip_event> ch_ev_buffer;
+    
+        // stave identificator
+        std::uint8_t stave_id;
+    
+        // MOSAIC readout flags    
+        std::uint8_t channel;
+        bool end_of_run;
+        bool overflow;
+    
+        ClassDef(stave_event, 1);
+};
 
-    // MOSAIC readout flags
+class detector_event {
+    public:
+        // stave event storage
+        std::vector<stave_event> st_ev_buffer;
+        
+        // event time identificators  
+        std::uint16_t trg_n;
+        std::uint16_t event_begin;
+        std::uint16_t event_end;
+    
+        ClassDef(detector_event, 2);
+};
 
-    ClassDef(detector_event_tlu, 2);
+class detector_event_tlu {
+    public:
+        // stave event storage
+        std::vector<stave_event> st_ev_buffer;
+    
+        // to sync with the tlu
+        tlu_event tl_ev;
+    
+        // MOSAIC readout flags
+    
+        ClassDef(detector_event_tlu, 2);
 };
 
 #endif

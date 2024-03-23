@@ -36,41 +36,45 @@
 #include <stdint.h>
 
 class TAlpideDataParser : public MDataReceiver {
-public:
-  TAlpideDataParser();
-  void flush(){};
-  int  ReadEventData(int &nBytes, unsigned char *buffer);
-  bool hasData() { return (numClosedData != 0); }
+    public:
+        TAlpideDataParser();
+        void flush(){};
+        int  ReadEventData(int &nBytes, unsigned char *buffer);
+        bool hasData() { return (numClosedData != 0); }
 
-protected:
-  long parse(int numClosed);
+        enum eventFlag_e {
+            flagHeaderError       = (1 << 0),
+            flagDecoder10b8bError = (1 << 1),
+            flagOverSizeError     = (1 << 2)
+        };
 
-private:
-  enum dataCode_e {
-    DCODE_IDLE           = 0xff,
-    DCODE_CHIP_EMPTY     = 0x0e,
-    DSHIFT_CHIP_EMPTY    = 4,
-    DCODE_REGION_HEADER  = 0x06,
-    DSHIFT_REGION_HEADER = 5,
-    DCODE_DATA_SHORT     = 0x01, // 16 bits long
-    DSHIFT_DATA_SHORT    = 6,
-    DCODE_DATA_LONG      = 0x00, // 24 bits long
-    DSHIFT_DATA_LONG     = 6,
-    DCODE_CHIP_HEADER    = 0x0a, // Chip Header
-    DSHIFT_CHIP_HEADER   = 4,
-    DCODE_CHIP_TRAILER   = 0x0b, // Chip trailer
-    DSHIFT_CHIP_TRAILER  = 4
-  };
+    protected:
+        long parse(int numClosed);
 
-private:
-  long checkEvent(unsigned char *dBuffer, unsigned char *evFlagsPtr);
+    private:
+        enum dataCode_e {
+            DCODE_IDLE           = 0xff,
+            DCODE_CHIP_EMPTY     = 0x0e,
+            DSHIFT_CHIP_EMPTY    = 4,
+            DCODE_REGION_HEADER  = 0x06,
+            DSHIFT_REGION_HEADER = 5,
+            DCODE_DATA_SHORT     = 0x01, // 16 bits long
+            DSHIFT_DATA_SHORT    = 6,
+            DCODE_DATA_LONG      = 0x00, // 24 bits long
+            DSHIFT_DATA_LONG     = 6,
+            DCODE_CHIP_HEADER    = 0x0a, // Chip Header
+            DSHIFT_CHIP_HEADER   = 4,
+            DCODE_CHIP_TRAILER   = 0x0b, // Chip trailer
+            DSHIFT_CHIP_TRAILER  = 4,
+        
+            // TLU payload
+            DCODE_TLU_HEADER = 0xaa,
+            DCODE_TLU_TRAILER = 0xbb
+        };
 
-public:
-  enum eventFlag_e {
-    flagHeaderError       = (1 << 0),
-    flagDecoder10b8bError = (1 << 1),
-    flagOverSizeError     = (1 << 2)
-  };
+    long checkEvent(
+        unsigned char *dBuffer, 
+        unsigned char *evFlagsPtr);
 };
 
 #endif // TALPIDEDATAPARSER_H

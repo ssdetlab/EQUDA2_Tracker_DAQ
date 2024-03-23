@@ -37,63 +37,76 @@
 
 TAlpideDataParser::TAlpideDataParser() {}
 
+//
+// TODO: add TLU payload check
+//
 // fast parse of input frame
 // return the size of the data for the event pointed by dBuffer.
-long TAlpideDataParser::checkEvent(unsigned char *dBuffer, unsigned char *evFlagsPtr)
-{
-  unsigned char *p = dBuffer;
-  unsigned char  h;
-  int            d;
+long TAlpideDataParser::checkEvent(
+    unsigned char *dBuffer, 
+    unsigned char *evFlagsPtr) {
+        unsigned char *p = dBuffer;
+        unsigned char  h;
+        int            d;
 
-  for (int closed = 0; !closed;) {
-    if (p - dBuffer > dataBufferUsed)
-      throw MDataParserError("Try to parse more bytes than received size");
-
-    h = *p++;
-    if ((h >> DSHIFT_CHIP_EMPTY) == DCODE_CHIP_EMPTY) {
-      p++;
-      closed = 1;
-    }
-    else if ((h >> DSHIFT_CHIP_HEADER) == DCODE_CHIP_HEADER) {
-      p++;
-    }
-    else if ((h >> DSHIFT_CHIP_TRAILER) == DCODE_CHIP_TRAILER) {
-      closed = 1;
-      // additional trailer
-      *evFlagsPtr = *p++;
-    }
-    else if ((h >> DSHIFT_REGION_HEADER) == DCODE_REGION_HEADER) {
-    }
-    else if ((h >> DSHIFT_DATA_SHORT) == DCODE_DATA_SHORT) {
-      p++;
-    }
-    else if ((h >> DSHIFT_DATA_LONG) == DCODE_DATA_LONG) {
-      p += 2;
-    }
-    else {
-      d = h;
-      cout << " Unknow data header: " << std::hex << d << endl;
-    }
-  }
-
-  return (p - dBuffer);
+        for (int closed = 0; !closed;) {
+            if (p - dBuffer > dataBufferUsed) {
+                throw MDataParserError("Try to parse more bytes than received size");
+            }
+        
+            h = *p++;
+            if ((h >> DSHIFT_CHIP_EMPTY) == DCODE_CHIP_EMPTY) {
+                p++;
+                closed = 1;
+            
+                // Check for the TLU payload
+                if ((*p & 0xff) == DCODE_TLU_HEADER && (*(p + 3) == DCODE_TLU_TRAILER)) {
+                    p += 5; ///< take MOSAIC trailer into account
+                }
+            }
+            else if ((h >> DSHIFT_CHIP_HEADER) == DCODE_CHIP_HEADER) {
+                p++;
+            }
+            else if ((h >> DSHIFT_CHIP_TRAILER) == DCODE_CHIP_TRAILER) {
+                closed = 1;
+                *evFlagsPtr = (h & 0x0f);
+            
+                // Check for the TLU payload
+                if ((*p & 0xff) == DCODE_TLU_HEADER && (*(p + 3) == DCODE_TLU_TRAILER)) {
+                    p += 5; ///< take MOSAIC trailer into account
+            }
+            }
+            else if ((h >> DSHIFT_REGION_HEADER) == DCODE_REGION_HEADER) {
+            }
+            else if ((h >> DSHIFT_DATA_SHORT) == DCODE_DATA_SHORT) {
+                p++;
+            }
+            else if ((h >> DSHIFT_DATA_LONG) == DCODE_DATA_LONG) {
+                p += 2;
+            }
+            else {
+                d = h;
+                cout << " Unknow data header: " << std::hex << d << endl;
+            }
+        }
+        
+        return (p - dBuffer);
 }
 
 // parse all data starting from begin of buffer
-long TAlpideDataParser::parse(int numClosed)
-{
-  unsigned char *dBuffer = (unsigned char *)&dataBuffer[0];
-  unsigned char *p       = dBuffer;
-  long           evSize;
-  unsigned char  evFlags;
-
-  while (numClosed) {
-    evSize = checkEvent(p, &evFlags);
-    p += evSize;
-    numClosed--;
-  }
-
-  return (p - dBuffer);
+long TAlpideDataParser::parse(int numClosed) {
+    unsigned char *dBuffer = (unsigned char *)&dataBuffer[0];
+    unsigned char *p       = dBuffer;
+    long           evSize;
+    unsigned char  evFlags;
+    
+    while (numClosed) {
+        evSize = checkEvent(p, &evFlags);
+        p += evSize;
+        numClosed--;
+    }
+    
+    return (p - dBuffer);
 }
 
 //
@@ -102,37 +115,36 @@ long TAlpideDataParser::parse(int numClosed)
 //        0 := No data
 //       -1 := Event discharged
 //
-int TAlpideDataParser::ReadEventData(int &nBytes, unsigned char *buffer)
-{
-  unsigned char *dBuffer = (unsigned char *)&dataBuffer[0];
-  unsigned char *p       = dBuffer;
-  long           evSize;
-  long           retValue;
-  unsigned char  evFlags;
+int TAlpideDataParser::ReadEventData(int &nBytes, unsigned char *buffer) {
+    unsigned char *dBuffer = (unsigned char *)&dataBuffer[0];
+    unsigned char *p       = dBuffer;
+    long           evSize;
+    long           retValue;
+    unsigned char  evFlags;
 
-  if (numClosedData == 0) return 0;
-
-  evSize = checkEvent(p, &evFlags);
-
-  if (evSize + MOSAIC_HEADER_SIZE < MAX_EVENT_SIZE) {
-    // copy the block header to the user buffer
-    memcpy(buffer, blockHeader, MOSAIC_HEADER_SIZE);
-    // copy data to user buffer
-    memcpy(buffer + MOSAIC_HEADER_SIZE, dBuffer, evSize);
-    nBytes   = MOSAIC_HEADER_SIZE + evSize;
-    retValue = evSize;
-  }
-  else {
-    cerr << "One event exceeds the maximum buffer dimension (" << (MOSAIC_HEADER_SIZE + evSize)
-         << " > " << MAX_EVENT_SIZE << ") Event discharged !" << endl;
-    nBytes   = 0;
-    retValue = -1;
-  }
-
-  // move unused bytes to the begin of buffer
-  size_t bytesToMove = dataBufferUsed - evSize;
-  if (bytesToMove > 0) memmove(&dataBuffer[0], &dataBuffer[evSize], bytesToMove);
-  dataBufferUsed -= evSize;
-  numClosedData--;
-  return retValue;
+    if (numClosedData == 0) return 0;
+    
+    evSize = checkEvent(p, &evFlags);
+    
+    if (evSize + MOSAIC_HEADER_SIZE < MAX_EVENT_SIZE) {
+        // copy the block header to the user buffer
+        memcpy(buffer, blockHeader, MOSAIC_HEADER_SIZE);
+        // copy data to user buffer
+        memcpy(buffer + MOSAIC_HEADER_SIZE, dBuffer, evSize);
+        nBytes   = MOSAIC_HEADER_SIZE + evSize;
+        retValue = evSize;
+    }
+    else {
+        cerr << "One event exceeds the maximum buffer dimension (" << (MOSAIC_HEADER_SIZE + evSize)
+            << " > " << MAX_EVENT_SIZE << ") Event discharged !" << endl;
+        nBytes   = 0;
+        retValue = -1;
+    }
+    
+    // move unused bytes to the begin of buffer
+    size_t bytesToMove = dataBufferUsed - evSize;
+    if (bytesToMove > 0) memmove(&dataBuffer[0], &dataBuffer[evSize], bytesToMove);
+    dataBufferUsed -= evSize;
+    numClosedData--;
+    return retValue;
 }
