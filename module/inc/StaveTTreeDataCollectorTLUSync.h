@@ -46,9 +46,9 @@ class StaveTTreeDataCollectorTLUSync : public eudaq::DataCollector{
 
         // buffers to temporary store data and sync chip events 
         // and to keep track of the insertion order
-        std::map<unsigned int,std::vector<stave_event>> temp_st_ev_buffer;
-        std::map<unsigned int,tlu_event> temp_tlu_ev_buffer;
-        std::shared_ptr<circ_buffer<unsigned int>> ev_ins_ord;  
+        std::map<std::uint16_t,std::vector<stave_event>> temp_st_ev_buffer;
+        std::map<std::uint16_t,tlu_event> temp_tlu_ev_buffer;
+        std::shared_ptr<circ_buffer<std::uint16_t>> ev_ins_ord;  
 
         // online monitor protection
         bool online;

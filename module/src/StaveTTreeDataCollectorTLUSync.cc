@@ -10,7 +10,7 @@ class TLUPayloadDecoder {
         // TLU payload
         static const std::uint8_t  DCODE_TLU_HEADER = 0xaa;
         static const std::uint8_t  DCODE_TLU_TRAILER = 0xbb;
-        static const std::uint32_t DSIZE_TLU_PAYLOAD = 4;
+        static const std::uint16_t DSIZE_TLU_PAYLOAD = 4;
 
         static bool DecodeEvent(
             std::uint8_t *data, 
@@ -57,7 +57,7 @@ void StaveTTreeDataCollectorTLUSync::DoConfigure() {
     
     // initialize cyclic buffer to keep track
     // of the insertion order
-    ev_ins_ord = std::make_shared<circ_buffer<std::uint32_t>>(n_staves*min_ev_to_dump*2);
+    ev_ins_ord = std::make_shared<circ_buffer<std::uint16_t>>(n_staves*min_ev_to_dump*2);
     
     // initiazlize error packet counters 
     header_error   = 0;
@@ -98,13 +98,13 @@ void StaveTTreeDataCollectorTLUSync::DoReceive(eudaq::ConnectionSPC idx, eudaq::
             static_cast<std::uint8_t>(
                 eudaq::from_string<std::uint16_t>(ev->GetTag("TYPE")));
     
-        event.particles = eudaq::from_string<std::uint32_t>(ev->GetTag("PARTICLES"));
-        event.scaler_0  = eudaq::from_string<std::uint32_t>(ev->GetTag("SCALER0"));
-        event.scaler_1  = eudaq::from_string<std::uint32_t>(ev->GetTag("SCALER1"));
-        event.scaler_2  = eudaq::from_string<std::uint32_t>(ev->GetTag("SCALER2"));
-        event.scaler_3  = eudaq::from_string<std::uint32_t>(ev->GetTag("SCALER3"));
-        event.scaler_4  = eudaq::from_string<std::uint32_t>(ev->GetTag("SCALER4"));
-        event.scaler_5  = eudaq::from_string<std::uint32_t>(ev->GetTag("SCALER5"));
+        event.particles = eudaq::from_string<std::uint16_t>(ev->GetTag("PARTICLES"));
+        event.scaler_0  = eudaq::from_string<std::uint16_t>(ev->GetTag("SCALER0"));
+        event.scaler_1  = eudaq::from_string<std::uint16_t>(ev->GetTag("SCALER1"));
+        event.scaler_2  = eudaq::from_string<std::uint16_t>(ev->GetTag("SCALER2"));
+        event.scaler_3  = eudaq::from_string<std::uint16_t>(ev->GetTag("SCALER3"));
+        event.scaler_4  = eudaq::from_string<std::uint16_t>(ev->GetTag("SCALER4"));
+        event.scaler_5  = eudaq::from_string<std::uint16_t>(ev->GetTag("SCALER5"));
     
         temp_tlu_ev_buffer[ev->GetTriggerN()] = event;
         ev_ins_ord->write(ev->GetTriggerN());
@@ -240,9 +240,9 @@ void StaveTTreeDataCollectorTLUSync::DoReceive(eudaq::ConnectionSPC idx, eudaq::
     // number threshold start dumping events
     if (is_ev_queue_empty() && ev_ins_ord->get_distance() > min_ev_to_dump) {
         // get oldest events trigger ids to dump them into tree
-        std::uint32_t coff = 
-            static_cast<std::uint32_t>(min_ev_to_dump/2.);
-        std::vector<std::uint32_t> 
+        std::uint16_t coff = 
+            static_cast<std::uint16_t>(min_ev_to_dump/2.);
+        std::vector<std::uint16_t> 
             oldest_ev = ev_ins_ord->const_slice(coff); 
     
         // dump oldest events
@@ -281,7 +281,7 @@ void StaveTTreeDataCollectorTLUSync::DoReceive(eudaq::ConnectionSPC idx, eudaq::
     // increase buffer size if we've reached "dangerous" point
     // (useful for high event rates)
     if (ev_ins_ord->get_distance() == 
-        static_cast<std::uint32_t>(ev_ins_ord->size()/2.)) { 
+        static_cast<std::uint16_t>(ev_ins_ord->size()/2.)) { 
             ev_ins_ord->resize(ev_ins_ord->size());
     }
     WriteEvent(std::move(ev));
