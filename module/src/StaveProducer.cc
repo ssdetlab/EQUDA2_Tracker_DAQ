@@ -4,27 +4,22 @@
 #include "THIC.h"
 #include <unordered_map>
 
-StaveProducer::StaveProducer(
-    const std::string & name, 
-    const std::string & runcontrol)
-        :eudaq::Producer(name, runcontrol), 
-        running(false), configured(false) {}
+#include "json/writer.h"
+#include "json/reader.h"
+#include "json/value.h"
 
-void StaveProducer::DoInitialise(){}
-
-void StaveProducer::setup_mosaic(std::string conf_dir) {
+void StaveController::setup_mosaic(std::string conf_dir) {
     // set up configuration's name
     std::string mosaic_conf_name = 
         "Mosaic_" + std::to_string(this->stave_id) + ".conf";
     conf_dir.append(mosaic_conf_name);
     
-    EUDAQ_INFO(mosaic_conf_name);
-    
     // load configuration file 
     auto m_conf = eudaq::Configuration();
     std::filebuf fb;
-    if(!fb.open(conf_dir, std::ios::in)){
-        EUDAQ_THROW("Error when trying to open configuration file for MOSAIC_" 
+    if(!fb.open(conf_dir, std::ios::in)) {
+        throw std::runtime_error(
+            "Error when trying to open configuration file for MOSAIC_" 
             + std::to_string(this->stave_id) + ". Aborting producer.");
         return;
     }
@@ -43,10 +38,10 @@ void StaveProducer::setup_mosaic(std::string conf_dir) {
     int  m_trig_del        = m_conf.Get("TRIG_DELAY",           20);
     int  m_pulse_del       = m_conf.Get("PULSE_DELAY",          10000);
     int  m_poll_timeout    = m_conf.Get("POLLING_DATA_TIMEOUT", 500);
-    int  m_manchester_dis  = m_conf.Get("MANCHESTER_DISABLED",  0);
     auto m_data_link_speed = static_cast<Mosaic::TReceiverSpeed>(m_conf.Get("DATA_LINK_SPEED", 0));
+    int  m_manchester_dis  = m_conf.Get("MANCHESTER_DISABLED",  0);
 
-    this->mosaic_conf = new TBoardConfigMOSAIC();
+    mosaic_conf = new TBoardConfigMOSAIC();
     mosaic_conf->SetIPaddress(m_ip_addr.c_str());
     mosaic_conf->SetTCPport(m_tcp_addr);
     mosaic_conf->SetCtrlInterfaceNum(m_nof_ctrl_ifc);
@@ -61,12 +56,12 @@ void StaveProducer::setup_mosaic(std::string conf_dir) {
     mosaic_conf->SetPollingDataTimeout(m_poll_timeout);
     mosaic_conf->SetManchesterDisable(m_manchester_dis);
     
-    mosaic = new TReadoutBoardMOSAIC(this->alice_conf, this->mosaic_conf);
+    mosaic = new TReadoutBoardMOSAIC(alice_conf, mosaic_conf);
 }
 
-void StaveProducer::setup_chip_conf(eudaq::Configuration c_conf, std::uint8_t chip_id){
+void StaveController::setup_chip_conf(eudaq::Configuration c_conf, std::uint8_t chip_id) {
     // set up chip and configuration classes
-    TChipConfig* chip_conf = new TChipConfig(this->alice_conf, chip_id);
+    TChipConfig* chip_conf = new TChipConfig(alice_conf, chip_id);
     
     // general
     chip_conf->SetParamValue("CHIP_ID",          chip_id);
@@ -137,56 +132,57 @@ void StaveProducer::setup_chip_conf(eudaq::Configuration c_conf, std::uint8_t ch
     chip_conf->SetParamValue("DTUPREEMP",   c_conf.Get("DTU_PREEMP",   ChipConfig::DTU_PREEMP));
     chip_conf->SetParamValue("DCTRLDRIVER", c_conf.Get("DCTRL_DRIVER", ChipConfig::DCTRL_DRIVER));
     
+    // Scans
+    chip_conf->SetParamValue("SCAN_THR_ITHR", c_conf.Get("SCAN_THR_ITHR", ChipConfig::SCAN_THR_ITHR));
+    chip_conf->SetParamValue("SCAN_THR_DV",   c_conf.Get("SCAN_THR_DV",   ChipConfig::SCAN_THR_DV));
+    chip_conf->SetParamValue("SCAN_FHR",      c_conf.Get("SCAN_FHR",      ChipConfig::SCAN_FHR));
+
     // store chip configuration in 
     // the internal class buffers 
     chip_confs[chip_id] = chip_conf;
 }
 
-scan_info StaveProducer::setup_chip_scans(eudaq::Configuration c_conf, std::uint8_t chip_id){
-    scan_info scan_inf;
-
-    scan_inf.do_scan[digital]   = c_conf.Get("SCAN_DIGITAL",      0);
-    scan_inf.test_mode[digital] = c_conf.Get("SCAN_DIGITAL_TEST", 0);
-    scan_inf.n_it[digital]      = c_conf.Get("SCAN_DIGITAL_IT",   100);
-    
-    scan_inf.do_scan[fhr]   = c_conf.Get("SCAN_FHR",      0);
-    scan_inf.test_mode[fhr] = c_conf.Get("SCAN_FHR_TEST", 0);
-    scan_inf.n_it[fhr]      = c_conf.Get("SCAN_FHR_IT",   10000);
-    
-    scan_inf.do_scan[thr_ithr]   = c_conf.Get("SCAN_THR",      0);
-    scan_inf.do_scan[thr_dv]     = c_conf.Get("SCAN_THR",      0);
-    scan_inf.test_mode[thr_ithr] = c_conf.Get("SCAN_THR_TEST", 0);
-    scan_inf.test_mode[thr_dv]   = c_conf.Get("SCAN_THR_TEST", 0);
-    scan_inf.n_it[thr_ithr]      = c_conf.Get("SCAN_THR_IT",   50);
-    scan_inf.n_it[thr_dv]        = c_conf.Get("SCAN_THR_IT",   50);
-    
-    int thr_ithr_min = c_conf.Get("SCAN_THR_ITHR_MIN", 0);
-    int thr_ithr_max = c_conf.Get("SCAN_THR_ITHR_MAX", 255);
-    int thr_dv_min   = c_conf.Get("SCAN_THR_DV_MIN",   0);
-    int thr_dv_max   = c_conf.Get("SCAN_THR_DV_MAX",   110);
-    
-    for(int i = thr_ithr_min; i <= thr_ithr_max; i++){
-        scan_inf.ithr_range.push_back(i);
+void StaveController::config_bad_pixels(std::string path) {
+    std::fstream fin;
+    path += "stave_" + std::to_string(stave_id) + ".json";
+    fin.open(path, std::ios::in);
+    Json::Value root;
+    Json::Reader reader;
+    reader.parse(fin, root);
+    fin.close();
+    for (auto id : root.getMemberNames()) {
+        std::vector<int> xs;
+        std::vector<int> ys;
+        for (auto ix : root[id]["bad_pixels"]["pix_x"]) {
+            int pix_x = ix.asInt();
+            xs.push_back(pix_x);
+        }
+        for (auto iy : root[id]["bad_pixels"]["pix_y"]) {
+            int pix_y = iy.asInt();
+            ys.push_back(pix_y);
+        }
+        for (int i = 0; i < xs.size(); i++) {
+            AlpideConfig::WritePixRegSingle(
+                chips.at(static_cast<std::uint8_t>(std::stoi(id))), 
+                Alpide::PIXREG_MASK, 
+                true, 
+                ys.at(i), 
+                xs.at(i));
+        }
     }
-    for(int i = thr_dv_min; i <= thr_dv_max; i++){
-        scan_inf.dv_range.push_back(i);
-    }
-    
-    return scan_inf;
 }
 
-void StaveProducer::setup_chips(std::string conf_dir){
+void StaveController::setup_chips(std::string conf_dir) {
     // set up chip configurations
-    std::map<int,scan_info> scan_inf;
-    for(int i = 0; i < 9; i++){
+    for (int i = 0; i < 9; i++) {
         // set up chip configuration directory
         std::string chip_conf_name = "ALPIDE_" + std::to_string(i) + ".conf";
     
         // load configuration file 
         auto c_conf = eudaq::Configuration();
         std::filebuf fb;
-        if(!fb.open(conf_dir + chip_conf_name, std::ios::in)){
-            EUDAQ_THROW(
+        if(!fb.open(conf_dir + chip_conf_name, std::ios::in)) {
+            throw std::runtime_error(
                 "Error when trying to open configuration file for chip " 
                 + std::to_string(i) + ".");
         }
@@ -194,123 +190,113 @@ void StaveProducer::setup_chips(std::string conf_dir){
         c_conf.Load(file, "ALPIDE"); 
     
         setup_chip_conf(c_conf, i);
-        scan_inf[i] = setup_chip_scans(c_conf, i);
     
         // initialize chip class and connect it 
         // to MOSAIC
         if (!chip_confs[i]->IsEnabled()) {
             continue;
         }
-        EUDAQ_INFO("Enabling " + std::to_string(i));
         TAlpide* chip = new TAlpide(chip_confs[i]);
         chips[i] = chip;
         chip->SetReadoutBoard(dynamic_cast<TReadoutBoard*>(this->mosaic));
         mosaic->AddChip(i, 0, RCVMAP[i], chip);
     }
-    
-    // perform noise scans (if needed)
-    for(auto si : scan_inf){
-        if(si.second.do_scan[thr_ithr]){
-            threshold_scan(stats_dir, scan_inf);
-            break;
-        }
-    }
-    for(auto si : scan_inf){
-        if(si.second.do_scan[digital]){
-            digital_scan(stats_dir, scan_inf);
-            break;
-        }
-    }
-    for(auto si : scan_inf){
-        if(si.second.do_scan[fhr]){
-            fhr_scan(stats_dir, scan_inf);
-            break;
-        }
-    }
-    
+
     // apply chip configuration
-    for (auto chip : chips) {
-        mosaic->SendOpCode(Alpide::OPCODE_GRST, chip.second);
-        mosaic->SendOpCode(Alpide::OPCODE_PRST, chip.second);
-        AlpideConfig::ConfigureDACs(chip.second);
-        AlpideConfig::ConfigureCMUDMU(chip.second);
-        AlpideConfig::ConfigureFromu(chip.second);
-        AlpideConfig::ConfigurePLL(chip.second);
-        AlpideConfig::ConfigureModeControl(chip.second);
-        AlpideConfig::WritePixRegAll(chip.second, Alpide::PIXREG_MASK, false);
-        AlpideConfig::WritePixRegAll(chip.second, Alpide::PIXREG_SELECT, false);
-        mosaic->SendOpCode(Alpide::OPCODE_RORST, chip.second);
+    for (auto [id,chip] : chips) {
+        mosaic->SendOpCode(Alpide::OPCODE_GRST, chip);
+        mosaic->SendOpCode(Alpide::OPCODE_PRST, chip);
+        AlpideConfig::ConfigureDACs(chip);
+        AlpideConfig::ConfigureCMUDMU(chip);
+        AlpideConfig::ConfigureFromu(chip);
+        AlpideConfig::ConfigurePLL(chip);
+        AlpideConfig::ConfigureModeControl(chip);
+        AlpideConfig::WritePixRegAll(chip, Alpide::PIXREG_MASK, false);
+        AlpideConfig::WritePixRegAll(chip, Alpide::PIXREG_SELECT, false);
+        mosaic->SendOpCode(Alpide::OPCODE_RORST, chip);
     }
 }
 
-void StaveProducer::DoConfigure(){
+StaveProducer::StaveProducer(
+    const std::string & name, 
+    const std::string & runcontrol)
+        : eudaq::Producer(name, runcontrol), 
+        running(false), configured(false) {}
+
+void StaveProducer::DoInitialise() {
+    control = std::make_shared<StaveController>();
+}
+
+void StaveProducer::DoConfigure() {
     // in case it's a second CONFIG call
-    if (this->configured) {
+    if (configured) {
         DoReset();
     } 
     
     // get root stave configuration
     auto conf = GetConfiguration();
     
-    stave_id  = conf->Get("STAVE_ID",        0);
-    stats_dir = conf->Get("STAVE_STATS_DIR", "");
+    control->stave_id  = conf->Get("STAVE_ID",        0);
+    control->stats_dir = conf->Get("STAVE_STATS_DIR", "");
     // set up ALICE-standardized config file
     std::vector<int> chip_ids;
-    for(int i = 0; i < 9; i++){
+    for (int i = 0; i < 9; i++) {
         chip_ids.push_back(i);
     }
-    this->alice_conf = new TConfig(1, chip_ids, TBoardType::boardMOSAIC, TDeviceType::TYPE_IBHIC);
+    control->alice_conf = new TConfig(1, chip_ids, TBoardType::boardMOSAIC, TDeviceType::TYPE_IBHIC);
     
     // set up MOSAIC board
     std::string mosaic_conf_dir = conf->Get("MOSAIC_CONF_DIR", "");
-    setup_mosaic(mosaic_conf_dir);
+    control->setup_mosaic(mosaic_conf_dir);
     
     // set up ALPIDE chips
-    std::string alpide_conf_dir = conf->Get("ALPIDE_CONF_DIR", "");
-    setup_chips(alpide_conf_dir);
+    std::string chip_conf_dir = conf->Get("ALPIDE_CONF_DIR", "");
+    control->setup_chips(chip_conf_dir);
     
     // configure bad pixels
-    double stuck_tol = conf->Get("DIGITAL_STUCK_TOL", 0);
-    double fhr_tol   = conf->Get("FHR_TOL",           0);
-    // config_bad_pixels(stats_dir, stuck_tol, fhr_tol);
+    control->config_bad_pixels(control->stats_dir);
     
     // configure MOSAIC triggers
-    mosaic->SetTriggerConfig(false, true, mosaic->GetConfig()->GetTriggerDelay(), 
-                                            mosaic->GetConfig()->GetPulseDelay());
-    mosaic->SetTriggerSource(trigExt);
-    
+    control->mosaic->SetTriggerConfig(
+        false, false, 
+        control->mosaic->GetConfig()->GetTriggerDelay(), 
+        control->mosaic->GetConfig()->GetPulseDelay());
+    control->mosaic->SetTriggerSource(trigExt);
+
     configured = true;
 }
 
-void StaveProducer::RunLoop(){
+void StaveProducer::RunLoop() {
     // initialize counters
     std::uint16_t non_empty_frames = 0, trg_n = 0;
     
-    mosaic->StartRun();
+    control->mosaic->SendOpCode(Alpide::OPCODE_BCRST);
+    control->mosaic->StartRun();
     while (running) {
         // poll all of the active chips
         std::vector<std::uint8_t> block;
         std::vector<int> n_bytes_data;
-        for (int i = 0; i < chips.size(); i++) {
+        for (int i = 0; i < control->chips.size(); i++) {
             std::uint8_t buffer[MAX_EVENT_SIZE];
             int data_size_dummy;
-            int res = mosaic->ReadEventData(data_size_dummy, buffer);
+            int res = control->mosaic->ReadEventData(data_size_dummy, buffer);
             // discard no data events
-            if ((buffer[64] & 0xf0) == 0xe0) {
+            if (res == 0 || (buffer[64] & 0xf0) == 0xe0) {
                 continue;
             }
             n_bytes_data.push_back(data_size_dummy);
+            // std::cout << "DATA SIZE = " << data_size_dummy << std::endl;
             block.insert(block.end(), std::begin(buffer), std::end(buffer));
         }
         // if no data were found 
         // skip event
-        if(block.size() == 0){
+        if(block.size() == 0) {
             continue;
         }
         auto ev = eudaq::Event::MakeUnique("StaveRaw");
-        ev->SetTag("Stave ID", std::to_string(this->stave_id));
-        ev->AddBlock(this->stave_id, block);
-        for(int i = 0; i < block.size()/MAX_EVENT_SIZE; i++){
+        ev->SetTag("Stave ID", std::to_string(control->stave_id));
+        ev->AddBlock(control->stave_id, block);
+        for (int i = 0; i < block.size()/MAX_EVENT_SIZE; i++) {
             ev->SetTag("Event size " + std::to_string(i), n_bytes_data[i]);
         }
         // This is a dummy trigger ID
@@ -320,42 +306,43 @@ void StaveProducer::RunLoop(){
         trg_n++;
         SendEvent(std::move(ev)); 
     }
-    EUDAQ_INFO("Stave:" + std::to_string(this->stave_id) + ": MOSAIC triggers sent:" + std::to_string(mosaic->GetTriggerCount()));
-    for(auto chip : chips){
+    control->mosaic->StopRun();
+
+    EUDAQ_INFO("Stave:" + std::to_string(control->stave_id) + ": MOSAIC triggers sent:" + std::to_string(control->mosaic->GetTriggerCount()));
+    for (auto chip : control->chips) {
         uint16_t val;
-        mosaic->ReadChipRegister(0x0009, val, chip.second);
-        EUDAQ_INFO("Stave:" + std::to_string(this->stave_id) + " ALPIDE_ " 
+        control->mosaic->ReadChipRegister(0x0009, val, chip.second);
+        EUDAQ_INFO("Stave:" + std::to_string(control->stave_id) + " ALPIDE_ " 
                             + std::to_string(chip.second->GetConfig()->GetChipId()) + ": Triggers:" 
                             + std::to_string(val));
-        mosaic->ReadChipRegister(0x000A, val, chip.second);
-        EUDAQ_INFO("Stave:" + std::to_string(this->stave_id) + " ALPIDE_ " 
+        control->mosaic->ReadChipRegister(0x000A, val, chip.second);
+        EUDAQ_INFO("Stave:" + std::to_string(control->stave_id) + " ALPIDE_ " 
                             + std::to_string(chip.second->GetConfig()->GetChipId()) + ": Strobes:"         
                             + std::to_string(val));
-        mosaic->ReadChipRegister(0x000B, val, chip.second);
-        EUDAQ_INFO("Stave:" + std::to_string(this->stave_id) + " ALPIDE_ " 
+        control->mosaic->ReadChipRegister(0x000B, val, chip.second);
+        EUDAQ_INFO("Stave:" + std::to_string(control->stave_id) + " ALPIDE_ " 
                             + std::to_string(chip.second->GetConfig()->GetChipId()) + ": Matrix readouts:" 
                             + std::to_string(val));
-        mosaic->ReadChipRegister(0x000C, val, chip.second);
-        EUDAQ_INFO("Stave:" + std::to_string(this->stave_id) + " ALPIDE_ " 
+        control->mosaic->ReadChipRegister(0x000C, val, chip.second);
+        EUDAQ_INFO("Stave:" + std::to_string(control->stave_id) + " ALPIDE_ " 
                             + std::to_string(chip.second->GetConfig()->GetChipId()) + ": Frames:" 
                             + std::to_string(val));
     }
-    EUDAQ_INFO("Stave:" + std::to_string(this->stave_id) + " Non-Empty Frames:" + std::to_string(non_empty_frames));
-    mosaic->StopRun();
+    EUDAQ_INFO("Stave:" + std::to_string(control->stave_id) + " Non-Empty Frames:" + std::to_string(non_empty_frames));
 }
 
-void StaveProducer::DoStartRun(){
+void StaveProducer::DoStartRun() {
     running = true;
 }
 
-void StaveProducer::DoStopRun(){
+void StaveProducer::DoStopRun() {
     running = false;
 }
 
-void StaveProducer::DoReset(){
+void StaveProducer::DoReset() {
     running = false;
 }
 
-void StaveProducer::DoTerminate(){
+void StaveProducer::DoTerminate() {
     running = false;
 }

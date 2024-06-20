@@ -16,7 +16,7 @@
 #ifndef StaveTTreeDataCollector_h
 #define StaveTTreeDataCollector_h
 
-class StaveTTreeDataCollector : public eudaq::DataCollector{
+class StaveTTreeDataCollector : public eudaq::DataCollector {
     public:
         using eudaq::DataCollector::DataCollector;
         void DoStopRun()                                           override;
@@ -46,8 +46,8 @@ class StaveTTreeDataCollector : public eudaq::DataCollector{
 
         // buffers to temporary store data and sync chip events 
         // and to keep track of the insertion order
-        std::map<unsigned int,std::vector<stave_event>> temp_ev_buffer;
-        std::shared_ptr<circ_buffer<unsigned int>> ev_ins_ord;  
+        std::map<std::uint32_t,std::map<std::uint8_t,std::vector<chip_event>>> temp_chip_ev_buffer;
+        std::shared_ptr<circ_buffer<std::uint32_t>> ev_ins_ord;  
 
         // online monitor protection
         bool online;
@@ -56,7 +56,7 @@ class StaveTTreeDataCollector : public eudaq::DataCollector{
         bool configured = false;
 };
 
-namespace{
+namespace {
     auto dummy0 = eudaq::Factory<eudaq::DataCollector>::
         Register<StaveTTreeDataCollector, const std::string&, const std::string&>
         (StaveTTreeDataCollector::m_id_factory);

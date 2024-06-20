@@ -16,7 +16,7 @@
 #ifndef StaveTTreeDataCollector_h
 #define StaveTTreeDataCollector_h
 
-class StaveTTreeDataCollectorTLUSync : public eudaq::DataCollector{
+class StaveTTreeDataCollectorTLUSync : public eudaq::DataCollector {
     public:
         using eudaq::DataCollector::DataCollector;
         void DoStopRun()                                           override;
@@ -46,7 +46,7 @@ class StaveTTreeDataCollectorTLUSync : public eudaq::DataCollector{
 
         // buffers to temporary store data and sync chip events 
         // and to keep track of the insertion order
-        std::map<std::uint16_t,std::vector<stave_event>> temp_st_ev_buffer;
+        std::map<std::uint16_t,std::map<std::uint8_t,std::vector<chip_event>>> temp_chip_ev_buffer;
         std::map<std::uint16_t,tlu_event> temp_tlu_ev_buffer;
         std::shared_ptr<circ_buffer<std::uint16_t>> ev_ins_ord;  
 
@@ -57,7 +57,7 @@ class StaveTTreeDataCollectorTLUSync : public eudaq::DataCollector{
         bool configured = false;
 };
 
-namespace{
+namespace {
     auto dummy0 = eudaq::Factory<eudaq::DataCollector>::
         Register<StaveTTreeDataCollectorTLUSync, const std::string&, const std::string&>
         (StaveTTreeDataCollectorTLUSync::m_id_factory);

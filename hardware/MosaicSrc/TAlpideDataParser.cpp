@@ -53,13 +53,12 @@ long TAlpideDataParser::checkEvent(
         
             h = *p++;
             if ((h >> DSHIFT_CHIP_EMPTY) == DCODE_CHIP_EMPTY) {
-                p++;
                 closed = 1;
-            
+                p++;            
                 // Check for the TLU payload
                 if ((*p & 0xff) == DCODE_TLU_HEADER && (*(p + 3) == DCODE_TLU_TRAILER)) {
                     p += 5; ///< take MOSAIC trailer into account
-                }
+                } 
             }
             else if ((h >> DSHIFT_CHIP_HEADER) == DCODE_CHIP_HEADER) {
                 p++;
@@ -71,6 +70,9 @@ long TAlpideDataParser::checkEvent(
                 // Check for the TLU payload
                 if ((*p & 0xff) == DCODE_TLU_HEADER && (*(p + 3) == DCODE_TLU_TRAILER)) {
                     p += 5; ///< take MOSAIC trailer into account
+                }
+                else {
+                    p++; ///< take MOSAIC trailer into account
                 }
             }
             else if ((h >> DSHIFT_REGION_HEADER) == DCODE_REGION_HEADER) {
@@ -120,7 +122,6 @@ int TAlpideDataParser::ReadEventData(int &nBytes, unsigned char *buffer) {
     unsigned char  evFlags;
 
     if (numClosedData == 0) return 0;
-    
     evSize = checkEvent(p, &evFlags);
     
     if (evSize + MOSAIC_HEADER_SIZE < MAX_EVENT_SIZE) {

@@ -234,87 +234,86 @@ void TReadoutBoardMOSAIC::StopRun()
   closeTCP(); // FIXME: this could cause the lost of the tail of the buffer ...
 }
 
-int TReadoutBoardMOSAIC::ReadEventData(int &nBytes, unsigned char *buffer)
-{
-  MDataReceiver *dr;
-  long           readDataSize;
+int TReadoutBoardMOSAIC::ReadEventData(int &nBytes, unsigned char *buffer) {
+    MDataReceiver *dr;
+    long           readDataSize;
 
-
-  if (readTriggerInfo) {
-    if (trgDataParser->hasData()) {
-      uint32_t num  = -1U;
-      uint64_t time = -1U;
-      trgDataParser->ReadTriggerInfo(num, time);
-      triggerNum.push_back(num);
-      triggerTime.push_back(time);
-    }
-  }
-
-  // check for data in the receivers buffer
-  for (int i = 0; i < MAX_MOSAICTRANRECV; i++) {
-    if (alpideDataParser[i]->hasData()) {
-      return (alpideDataParser[i]->ReadEventData(nBytes, buffer));
-    }
-  }
-
-  // try to read from TCP connection
-  for (;;) {
-    try {
-      TCPtimeout   = fBoardConfig->GetPollingDataTimeout();
-      readDataSize = pollTCP(&dr);
-      if (readDataSize == 0){ 
-        return 0; // Zero means no data
-      }
-    }
-    catch (exception &e) {
-      cerr << e.what() << endl;
-      StopRun();
-      flushDataReceivers();
-      int ErrNums = decodeError();
-      if ((ErrNums & 0x03FF00) != 0) {
-        // This is an IDLE condition
-        throw;
-      }
-      else {
-        if ((ErrNums & 0x000001) != 0) {
-          // The flush of memory is done by the StopRun()
-          throw;
+    if (readTriggerInfo) {
+        if (trgDataParser->hasData()) {
+            uint32_t num  = -1U;
+            uint64_t time = -1U;
+            trgDataParser->ReadTriggerInfo(num, time);
+            triggerNum.push_back(num);
+            triggerTime.push_back(time);
         }
-        else {
-          exit(1);
+    }
+
+    // check for data in the receivers buffer
+    for (int i = 0; i < MAX_MOSAICTRANRECV; i++) {
+        if (alpideDataParser[i]->hasData()) {
+            return (alpideDataParser[i]->ReadEventData(nBytes, buffer));
         }
-      }
     }
 
-    // get event data from the selected data receiver
-    TAlpideDataParser *data = dynamic_cast<TAlpideDataParser *>(dr);
-    TrgRecorderParser *trg  = dynamic_cast<TrgRecorderParser *>(dr);
-    DummyReceiver *gendata  = dynamic_cast<DummyReceiver *>(dr);
-    if (data) {
-      if (data->hasData()) return (data->ReadEventData(nBytes, buffer));
+    // try to read from TCP connection
+    for (;;) {
+        try {
+            TCPtimeout   = fBoardConfig->GetPollingDataTimeout();
+            readDataSize = pollTCP(&dr);
+            if (readDataSize == 0) { 
+                return 0; // Zero means no data
+            }
+        }
+        catch (exception &e) {
+            cerr << e.what() << endl;
+            StopRun();
+            flushDataReceivers();
+            int ErrNums = decodeError();
+            if ((ErrNums & 0x03FF00) != 0) {
+                // This is an IDLE condition
+                throw;
+            }
+            else {
+                if ((ErrNums & 0x000001) != 0) {
+                    // The flush of memory is done by the StopRun()
+                    throw;
+                }
+                else {
+                    exit(1);
+                }
+            }
+        }
+    
+        // get event data from the selected data receiver
+        TAlpideDataParser *data = dynamic_cast<TAlpideDataParser *>(dr);
+        TrgRecorderParser *trg  = dynamic_cast<TrgRecorderParser *>(dr);
+        DummyReceiver *gendata  = dynamic_cast<DummyReceiver *>(dr);
+        if (data) {
+            if (data->hasData()) {
+                return (data->ReadEventData(nBytes, buffer));
+            }
+        }
+        if (trg) {
+            if (trg->hasData()) {
+                uint32_t num  = -1U;
+                uint64_t time = -1U;
+                trg->ReadTriggerInfo(num, time);
+                triggerNum.push_back(num);
+                triggerTime.push_back(time);
+            }
+        }
+        if (gendata) {
+            return (gendata->ReadEventData(nBytes, buffer));
+        }
     }
-    if (trg) {
-      if (trg->hasData()) {
-        uint32_t num  = -1U;
-        uint64_t time = -1U;
-        trg->ReadTriggerInfo(num, time);
-        triggerNum.push_back(num);
-        triggerTime.push_back(time);
-      }
-    }
-
-    if (gendata) {
-      return (gendata->ReadEventData(nBytes, buffer));
-    }
-  }
-  return -1;
+    return 0;
 }
 
 /* -------------------------
  * 		Private Methods
  ------------------------- */
 // Private : Init the board
-void TReadoutBoardMOSAIC::init(){
+void TReadoutBoardMOSAIC::init() {
   setIPaddress(fBoardConfig->GetIPaddress(), fBoardConfig->GetTCPport());
 
   std::cout << "MOSAIC firmware version: " << getFirmwareVersion() << std::endl;

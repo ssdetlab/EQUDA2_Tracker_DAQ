@@ -1,0 +1,202 @@
+{
+//========= Macro generated from object: /
+//========= by ROOT version6.26/04
+   
+   Double_t _fx1009[10] = {
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14};
+   Double_t _fy1009[10] = {
+   0.000354385,
+   0.00569229,
+   0.0387375,
+   0.140636,
+   0.319209,
+   0.522887,
+   0.700518,
+   0.826103,
+   0.903448,
+   0.948439};
+   Double_t _fex1009[10] = {
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0};
+   Double_t _fey1009[10] = {
+   0.00841736,
+   0.0336449,
+   0.0862982,
+   0.155472,
+   0.208478,
+   0.223372,
+   0.204838,
+   0.169503,
+   0.132083,
+   0.0988963};
+   gre = new TGraphErrors(10,_fx1009,_fy1009,_fex1009,_fey1009);
+   gre->SetName("");
+   gre->SetTitle("");
+   gre->SetFillStyle(1000);
+   
+   TH1F *Graph_Graph1009 = new TH1F("Graph_Graph1009","",100,4.1,14.9);
+   Graph_Graph1009->SetMinimum(-0.15705);
+   Graph_Graph1009->SetMaximum(1.15682);
+   Graph_Graph1009->SetDirectory(0);
+   Graph_Graph1009->SetStats(0);
+
+   ci = TColor::GetColor("#000099");
+   Graph_Graph1009->SetLineColor(ci);
+   Graph_Graph1009->GetXaxis()->SetLabelFont(42);
+   Graph_Graph1009->GetXaxis()->SetTitleOffset(1);
+   Graph_Graph1009->GetXaxis()->SetTitleFont(42);
+   Graph_Graph1009->GetYaxis()->SetLabelFont(42);
+   Graph_Graph1009->GetYaxis()->SetTitleFont(42);
+   Graph_Graph1009->GetZaxis()->SetLabelFont(42);
+   Graph_Graph1009->GetZaxis()->SetTitleOffset(1);
+   Graph_Graph1009->GetZaxis()->SetTitleFont(42);
+   gre->SetHistogram(Graph_Graph1009);
+   
+   
+   TF1 *fitFunc1010 = new TF1("*fitFunc",4.1,14.9,2);
+    //The original function : fitFunc had originally been created by:
+    //TF1 *fitFunc = new TF1("fitFunc",fitFunc,4.1,14.9,2, 1, TF1::EAddToList::kNo);
+   fitFunc1010->SetRange(4.1,14.9);
+   fitFunc1010->SetName("fitFunc");
+   fitFunc1010->SetTitle("fitFunc");
+   fitFunc1010->SetSavedPoint(0,0.000510616);
+   fitFunc1010->SetSavedPoint(1,0.000628203);
+   fitFunc1010->SetSavedPoint(2,0.000770367);
+   fitFunc1010->SetSavedPoint(3,0.00094165);
+   fitFunc1010->SetSavedPoint(4,0.0011473);
+   fitFunc1010->SetSavedPoint(5,0.00139337);
+   fitFunc1010->SetSavedPoint(6,0.00168677);
+   fitFunc1010->SetSavedPoint(7,0.00203541);
+   fitFunc1010->SetSavedPoint(8,0.00244825);
+   fitFunc1010->SetSavedPoint(9,0.00293542);
+   fitFunc1010->SetSavedPoint(10,0.00350832);
+   fitFunc1010->SetSavedPoint(11,0.0041797);
+   fitFunc1010->SetSavedPoint(12,0.00496378);
+   fitFunc1010->SetSavedPoint(13,0.0058763);
+   fitFunc1010->SetSavedPoint(14,0.00693465);
+   fitFunc1010->SetSavedPoint(15,0.00815786);
+   fitFunc1010->SetSavedPoint(16,0.00956675);
+   fitFunc1010->SetSavedPoint(17,0.0111839);
+   fitFunc1010->SetSavedPoint(18,0.0130336);
+   fitFunc1010->SetSavedPoint(19,0.0151421);
+   fitFunc1010->SetSavedPoint(20,0.0175373);
+   fitFunc1010->SetSavedPoint(21,0.0202486);
+   fitFunc1010->SetSavedPoint(22,0.0233073);
+   fitFunc1010->SetSavedPoint(23,0.0267459);
+   fitFunc1010->SetSavedPoint(24,0.0305982);
+   fitFunc1010->SetSavedPoint(25,0.0348991);
+   fitFunc1010->SetSavedPoint(26,0.0396842);
+   fitFunc1010->SetSavedPoint(27,0.0449897);
+   fitFunc1010->SetSavedPoint(28,0.0508517);
+   fitFunc1010->SetSavedPoint(29,0.0573063);
+   fitFunc1010->SetSavedPoint(30,0.0643889);
+   fitFunc1010->SetSavedPoint(31,0.0721335);
+   fitFunc1010->SetSavedPoint(32,0.0805729);
+   fitFunc1010->SetSavedPoint(33,0.0897376);
+   fitFunc1010->SetSavedPoint(34,0.0996556);
+   fitFunc1010->SetSavedPoint(35,0.110352);
+   fitFunc1010->SetSavedPoint(36,0.121847);
+   fitFunc1010->SetSavedPoint(37,0.134158);
+   fitFunc1010->SetSavedPoint(38,0.147298);
+   fitFunc1010->SetSavedPoint(39,0.161273);
+   fitFunc1010->SetSavedPoint(40,0.176087);
+   fitFunc1010->SetSavedPoint(41,0.191733);
+   fitFunc1010->SetSavedPoint(42,0.208203);
+   fitFunc1010->SetSavedPoint(43,0.22548);
+   fitFunc1010->SetSavedPoint(44,0.24354);
+   fitFunc1010->SetSavedPoint(45,0.262354);
+   fitFunc1010->SetSavedPoint(46,0.281886);
+   fitFunc1010->SetSavedPoint(47,0.302092);
+   fitFunc1010->SetSavedPoint(48,0.322924);
+   fitFunc1010->SetSavedPoint(49,0.344328);
+   fitFunc1010->SetSavedPoint(50,0.366241);
+   fitFunc1010->SetSavedPoint(51,0.3886);
+   fitFunc1010->SetSavedPoint(52,0.411334);
+   fitFunc1010->SetSavedPoint(53,0.43437);
+   fitFunc1010->SetSavedPoint(54,0.457632);
+   fitFunc1010->SetSavedPoint(55,0.481039);
+   fitFunc1010->SetSavedPoint(56,0.504512);
+   fitFunc1010->SetSavedPoint(57,0.527969);
+   fitFunc1010->SetSavedPoint(58,0.551329);
+   fitFunc1010->SetSavedPoint(59,0.574513);
+   fitFunc1010->SetSavedPoint(60,0.597442);
+   fitFunc1010->SetSavedPoint(61,0.620041);
+   fitFunc1010->SetSavedPoint(62,0.642237);
+   fitFunc1010->SetSavedPoint(63,0.663962);
+   fitFunc1010->SetSavedPoint(64,0.685152);
+   fitFunc1010->SetSavedPoint(65,0.70575);
+   fitFunc1010->SetSavedPoint(66,0.725702);
+   fitFunc1010->SetSavedPoint(67,0.744963);
+   fitFunc1010->SetSavedPoint(68,0.763491);
+   fitFunc1010->SetSavedPoint(69,0.781254);
+   fitFunc1010->SetSavedPoint(70,0.798223);
+   fitFunc1010->SetSavedPoint(71,0.814378);
+   fitFunc1010->SetSavedPoint(72,0.829705);
+   fitFunc1010->SetSavedPoint(73,0.844197);
+   fitFunc1010->SetSavedPoint(74,0.857851);
+   fitFunc1010->SetSavedPoint(75,0.870671);
+   fitFunc1010->SetSavedPoint(76,0.882667);
+   fitFunc1010->SetSavedPoint(77,0.893852);
+   fitFunc1010->SetSavedPoint(78,0.904247);
+   fitFunc1010->SetSavedPoint(79,0.913872);
+   fitFunc1010->SetSavedPoint(80,0.922755);
+   fitFunc1010->SetSavedPoint(81,0.930923);
+   fitFunc1010->SetSavedPoint(82,0.938409);
+   fitFunc1010->SetSavedPoint(83,0.945247);
+   fitFunc1010->SetSavedPoint(84,0.951469);
+   fitFunc1010->SetSavedPoint(85,0.957113);
+   fitFunc1010->SetSavedPoint(86,0.962214);
+   fitFunc1010->SetSavedPoint(87,0.966809);
+   fitFunc1010->SetSavedPoint(88,0.970933);
+   fitFunc1010->SetSavedPoint(89,0.974623);
+   fitFunc1010->SetSavedPoint(90,0.977911);
+   fitFunc1010->SetSavedPoint(91,0.980833);
+   fitFunc1010->SetSavedPoint(92,0.983419);
+   fitFunc1010->SetSavedPoint(93,0.985701);
+   fitFunc1010->SetSavedPoint(94,0.987706);
+   fitFunc1010->SetSavedPoint(95,0.989464);
+   fitFunc1010->SetSavedPoint(96,0.990998);
+   fitFunc1010->SetSavedPoint(97,0.992333);
+   fitFunc1010->SetSavedPoint(98,0.993491);
+   fitFunc1010->SetSavedPoint(99,0.994491);
+   fitFunc1010->SetSavedPoint(100,0.995352);
+   fitFunc1010->SetSavedPoint(101,4.1);
+   fitFunc1010->SetSavedPoint(102,14.9);
+   fitFunc1010->SetFillColor(19);
+   fitFunc1010->SetFillStyle(0);
+   fitFunc1010->SetLineColor(2);
+   fitFunc1010->SetLineWidth(2);
+   fitFunc1010->SetChisquare(0.456751);
+   fitFunc1010->SetNDF(8);
+   fitFunc1010->GetXaxis()->SetLabelFont(42);
+   fitFunc1010->GetXaxis()->SetTitleOffset(1);
+   fitFunc1010->GetXaxis()->SetTitleFont(42);
+   fitFunc1010->GetYaxis()->SetLabelFont(42);
+   fitFunc1010->GetYaxis()->SetTitleFont(42);
+   fitFunc1010->SetParameter(0,10.1272);
+   fitFunc1010->SetParError(0,0.504186);
+   fitFunc1010->SetParLimits(0,0,0);
+   fitFunc1010->SetParameter(1,1.835);
+   fitFunc1010->SetParError(1,0.378733);
+   fitFunc1010->SetParLimits(1,0,0);
+   fitFunc1010->SetParent(gre);
+   gre->GetListOfFunctions()->Add(fitFunc1010);
+   gre->Draw("");
+}

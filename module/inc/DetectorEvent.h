@@ -20,7 +20,11 @@ class chip_event {
         // chip identificators
         std::uint8_t chip_id;
         std::uint8_t channel;
-    
+
+        // flags    
+        bool end_of_run;
+        bool overflow;
+
         ClassDef(chip_event, 2);
 };
 
@@ -81,11 +85,9 @@ class stave_event {
         // stave identificator
         std::uint8_t stave_id;
     
-        // MOSAIC readout flags    
-        std::uint8_t channel;
-        bool end_of_run;
-        bool overflow;
-    
+        // Duplicate trig ID
+        std::uint16_t trg_n;
+
         ClassDef(stave_event, 1);
 };
 
