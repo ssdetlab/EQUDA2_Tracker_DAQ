@@ -10,6 +10,8 @@ add_library(
     src/StaveFakeHitRateScanner.cc  
     src/StaveTTreeDataCollector.cc  
     src/StaveTTreeDataCollectorTLUSync.cc
+    src/DummyProducer.cc
+    src/DummyDataCollector.cc
 )
 
 target_include_directories(

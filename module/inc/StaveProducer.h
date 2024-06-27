@@ -64,10 +64,10 @@ class StaveProducer : public eudaq::Producer {
 };
 
 namespace{
-  auto dummy0 = eudaq::Factory<eudaq::Producer>::
-    Register<StaveProducer, 
-        const std::string&, 
-        const std::string&>(StaveProducer::id_factory);
+    auto dummy0 = eudaq::Factory<eudaq::Producer>::
+        Register<StaveProducer, 
+            const std::string&, 
+            const std::string&>(StaveProducer::id_factory);
 }
 
 #endif
