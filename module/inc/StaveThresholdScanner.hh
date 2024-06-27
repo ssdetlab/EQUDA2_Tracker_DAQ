@@ -29,6 +29,9 @@ class StaveThresholdScanner {
             int dv_min,
             int dv_max);
 
+
+
+
         std::pair<double,double> 
         fit_thr_curve(
             std::vector<std::pair<int,double>> reg_to_hits, 
