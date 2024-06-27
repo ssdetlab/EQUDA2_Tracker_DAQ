@@ -1,5 +1,6 @@
-#ifndef TelescopeEvent_h
-#define TelescopeEvent_h
+#ifndef DetectorEvent_h
+#define DetectorEvent_h
+
 #include <map>
 #include <vector>
 #include <string>
@@ -16,14 +17,18 @@ class chip_event {
         bool is_flushed_incomplete;
         bool is_strobe_extended;
         bool is_busy_transition;
-    
+
+        // MOSAIC readout flags
+        bool end_of_run;
+        bool overflow;
+        bool timeout;
+        bool header_error;
+        bool decoder_10b8b_error;
+        bool event_oversize_error;
+
         // chip identificators
         std::uint8_t chip_id;
         std::uint8_t channel;
-
-        // flags    
-        bool end_of_run;
-        bool overflow;
 
         ClassDef(chip_event, 2);
 };

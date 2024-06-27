@@ -1,3 +1,6 @@
+#ifndef TLUDecoder_h
+#define TLUDecoder_h
+
 #include <cstdint>
 
 class TLUPayloadDecoder {
@@ -24,3 +27,5 @@ class TLUPayloadDecoder {
                 return true;
         };
 };
+
+#endif

@@ -8,30 +8,30 @@ const uint32_t DAQ_TRAILER_WORD = 0xbfbfbfbf; //
 // put all header and trailer information here
 // (both for mosaic and DAQ board)
 typedef struct {
-  // common
-  //  int  size;
-  // MOSAIC
-  int  channel;
-  int  eoeCount;
-  bool timeout;
-  bool endOfRun;
-  bool overflow;
-  bool headerError;        // the received Frame contains error in the transmission
-  bool decoder10b8bError;  // the MOSAIC board reports a 10b8b conversion error
-  bool eventOverSizeError; // the MOSAIC board reports an Event Over Size Error
-
-  // DAQ board
-  bool     almostFull;
-  int      trigType;
-  int      bufferDepth;
-  uint64_t eventId;
-  uint64_t timestamp;
-  int      eventSize;
-  bool     truncated;
-  int      strobeCount;
-  int      trigCountChipBusy;
-  int      trigCountDAQBusy;
-  int      extTrigCount;
+    // common
+    //  int  size;
+    // MOSAIC
+    int  channel;
+    int  eoeCount;
+    bool timeout;
+    bool endOfRun;
+    bool overflow;
+    bool headerError;        // the received Frame contains error in the transmission
+    bool decoder10b8bError;  // the MOSAIC board reports a 10b8b conversion error
+    bool eventOverSizeError; // the MOSAIC board reports an Event Over Size Error
+    
+    // DAQ board
+    bool     almostFull;
+    int      trigType;
+    int      bufferDepth;
+    uint64_t eventId;
+    uint64_t timestamp;
+    int      eventSize;
+    bool     truncated;
+    int      strobeCount;
+    int      trigCountChipBusy;
+    int      trigCountDAQBusy;
+    int      extTrigCount;
 } TBoardHeader;
 
 // Board Decoder decodes the information contained in the readout board header and trailer

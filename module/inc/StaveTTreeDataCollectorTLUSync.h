@@ -1,4 +1,6 @@
-#pragma once
+#ifndef StaveTTreeDataCollectorTLUSync_h
+#define StaveTTreeDataCollectorTLUSync_h
+
 #include "eudaq/DataCollector.hh"
 
 #include "DetectorEvent.h"
@@ -12,9 +14,6 @@
 
 #include <set>
 #include <omp.h>
-
-#ifndef StaveTTreeDataCollector_h
-#define StaveTTreeDataCollector_h
 
 class StaveTTreeDataCollectorTLUSync : public eudaq::DataCollector {
     public:

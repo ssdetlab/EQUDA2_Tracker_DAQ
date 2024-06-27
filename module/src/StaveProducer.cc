@@ -254,7 +254,7 @@ void StaveProducer::DoConfigure() {
     control->setup_chips(chip_conf_dir);
     
     // configure bad pixels
-    control->config_bad_pixels(control->stats_dir);
+    // control->config_bad_pixels(control->stats_dir);
     
     // configure MOSAIC triggers
     control->mosaic->SetTriggerConfig(

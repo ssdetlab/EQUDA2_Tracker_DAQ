@@ -29,24 +29,30 @@ void StaveTTreeDataCollector::DoConfigure() {
     // event to dump it
     n_staves       = conf->Get("NOF_STAVES",     1);
     min_ev_to_dump = conf->Get("MIN_EV_TO_DUMP", 10);
-    min_staves     = conf->Get("MIN_STAVES",     1);
     
     // initialize cyclic buffer to keep track
     // of the insertion order
     ev_ins_ord = std::make_shared<circ_buffer<std::uint32_t>>(n_staves*min_ev_to_dump*2);
     
-    // initiazlize error packet counters 
-    header_error   = 0;
-    errors8b10b    = 0;
-    oversize_error = 0;
-    
+    // initiazlize MOSAIC error frame counters 
+    end_of_run           = 0;
+    overflow             = 0;
+    timeout              = 0;
+    header_error         = 0;
+    decoder_10b8b_error  = 0;
+    event_oversize_error = 0;
+
+    // initiazlize ALPIDE error frame counters 
+    n_corrupted_chip = 0;
+    prio_errs        = 0;
+
     configured = true;
 }
 
 void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP ev) {
     // size holders and counters
     int n_bytes_header, n_bytes_trailer;
-    int n_corrupted_chip = 0, prio_err = 0;
+    int prio_err;
 
     // set up stave event
     std::uint8_t st_id = static_cast<std::uint8_t>(eudaq::from_string<std::uint16_t>(ev->GetTag("Stave ID")));
@@ -54,7 +60,6 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
     // iterate over the chips data
     std::vector<std::uint8_t> block = ev->GetBlock(st_id);
 
-    std::cout << "N EVENTS IN BLOCK = " << block.size()/MAX_EVENT_SIZE << std::endl;
     // distribute frame decoding between several threads
     #pragma omp parallel for num_threads(block.size()/MAX_EVENT_SIZE)
     for (int i = 0; i < block.size()/MAX_EVENT_SIZE; i ++) {
@@ -62,10 +67,8 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
 
         // each chip frame is in a separate 
         // MAX_EVENT_SIZE block of data
-        std::uint8_t buffer[MAX_EVENT_SIZE];
-        for (int j = 0; j < MAX_EVENT_SIZE; j++) {
-            buffer[j] = block[i*MAX_EVENT_SIZE + j];
-        }
+        std::uint8_t* buffer = &(block.at(i*MAX_EVENT_SIZE));
+
         // extract frame size for the MOSAIC decoder
         int n_bytes_data; 
         #pragma omp critical
@@ -80,27 +83,43 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
         BoardDecoder::DecodeEventMOSAIC(
             buffer, n_bytes_data, n_bytes_header, 
             n_bytes_trailer, board_info);
-        // check empty event
-        if (n_bytes_trailer == 0) {
-            continue;
+        
+        // fill MOSAIC flags
+        ch_ev.channel              = board_info.channel; 
+        ch_ev.overflow             = board_info.overflow;
+        ch_ev.end_of_run           = board_info.endOfRun;
+        ch_ev.timeout              = board_info.timeout;
+        ch_ev.header_error         = board_info.headerError;
+        ch_ev.decoder_10b8b_error  = board_info.decoder10b8bError;
+        ch_ev.event_oversize_error = board_info.eventOverSizeError;
+
+        // check for bad frame 
+        bool bad_mosaic = false;
+        if (board_info.overflow) {
+            end_of_run++;
+            bad_mosaic = true;
         }
-        // check damaged frame 
+        if (board_info.endOfRun) {
+            overflow++;
+            bad_mosaic = true;
+        }
+        if (board_info.timeout) {
+            timeout++;
+            bad_mosaic = true;
+        }
         if (board_info.headerError) {
             header_error++;
-            continue;
-        } 
-        if (board_info.decoder10b8bError) {
-            errors8b10b++;
-            continue;
-        } 
-        if (board_info.eventOverSizeError) {
-            oversize_error++;
-            continue;
+            bad_mosaic = true;
         }
-        // fill MOSAIC flags
-        ch_ev.channel    = board_info.channel; 
-        ch_ev.overflow   = board_info.overflow;
-        ch_ev.end_of_run = board_info.endOfRun;
+        if (board_info.decoder10b8bError) {
+            decoder_10b8b_error++;
+            bad_mosaic = true;
+        }
+        if (board_info.eventOverSizeError) {
+            event_oversize_error++;
+            bad_mosaic = true;
+        }
+
         // decode Chip event
         int n_bytes_chipevent = 
             n_bytes_data - 
@@ -117,6 +136,7 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
                 nullptr, nullptr, &bc_counter);
         // check event corruption (second condition -- BUSY VIOLATION)
         if (!not_corrrupted || (alpide_flags&0x8) == 1) {
+            prio_errs += prio_err;
             n_corrupted_chip++;
             continue;
         }
@@ -129,19 +149,20 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
         ch_ev.channel = hits[0].channel;
         // decode region->double_column->address
         // data structure into a hit-map
-        for (auto hit : hits) {
-            std::uint16_t rem = hit.address % 4;
-            if (rem == 0 || rem == 3) {
-                rem = 0;
+        if (!bad_mosaic) {
+            for (auto hit : hits) {
+                std::uint16_t rem = hit.address % 4;
+                if (rem == 0 || rem == 3) {
+                    rem = 0;
+                }
+                else {
+                    rem = 1;
+                }
+                std::uint16_t pix_x = hit.region*32 + hit.dcol*2 + rem;
+                std::uint16_t pix_y = hit.address/2;
+                ch_ev.hits.push_back(std::make_tuple(pix_x,pix_y));
             }
-            else {
-                rem = 1;
-            }
-            std::uint16_t pix_x = hit.region*32 + hit.dcol*2 + rem;
-            std::uint16_t pix_y = hit.address/2;
-            ch_ev.hits.push_back(std::make_tuple(pix_x,pix_y));
         }
-        // std::cout << "ch_ev.hits.size() = " << ch_ev.hits.size() << std::endl;
         // fill ALPIDE flags
         ch_ev.is_flushed_incomplete = (alpide_flags&0x4);
         ch_ev.is_strobe_extended    = (alpide_flags&0x2);
@@ -164,16 +185,19 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
         // get oldest events trigger ids to dump them into tree
         std::uint32_t coff = 
             static_cast<std::uint32_t>(min_ev_to_dump/2.);
-        std::vector<std::uint32_t> 
-            oldest_ev = ev_ins_ord->const_slice(coff); 
-        std::unique(oldest_ev.begin(), oldest_ev.end());
+        std::vector<std::uint32_t>::iterator
+            oldest_ev = ev_ins_ord->ptr_position(); 
 
         // dump oldest events
-        for (auto i : oldest_ev) {
+        for (auto it = oldest_ev; it != oldest_ev + coff; it++) {
+            std::uint32_t id = *it;
             std::vector<stave_event> st_ev_buff;
-            for (auto& chev : temp_chip_ev_buffer[i]) {
+            if (temp_chip_ev_buffer.find(id) == temp_chip_ev_buffer.end()) {
+                continue;
+            }
+            for (auto& chev : temp_chip_ev_buffer[id]) {
                 stave_event st_ev;
-                st_ev.trg_n = i;
+                st_ev.trg_n = id;
                 st_ev.stave_id = chev.first;
                 st_ev.ch_ev_buffer = chev.second;
                 st_ev_buff.push_back(st_ev);
@@ -190,7 +214,7 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
             }
         
             // clean buffer from dumped events
-            temp_chip_ev_buffer.erase(i);
+            temp_chip_ev_buffer.erase(id);
         }
     
         // clean insertion order tracker from 

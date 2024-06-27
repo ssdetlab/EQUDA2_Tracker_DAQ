@@ -14,32 +14,32 @@
 class TAlpide;
 
 struct StaveController {
-        StaveController() = default;
+    StaveController() = default;
 
-        // configurations
-        TConfig* alice_conf;
-        TBoardConfigMOSAIC* mosaic_conf;
-        std::map<std::uint8_t,TChipConfig*> chip_confs;
+    // configurations
+    TConfig* alice_conf;
+    TBoardConfigMOSAIC* mosaic_conf;
+    std::map<std::uint8_t,TChipConfig*> chip_confs;
 
-        // hardware classes
-        TReadoutBoardMOSAIC* mosaic;
-        std::map<std::uint8_t,TAlpide*> chips;
+    // hardware classes
+    TReadoutBoardMOSAIC* mosaic;
+    std::map<std::uint8_t,TAlpide*> chips;
 
-        std::uint8_t stave_id = 0;
-        int RCVMAP[9] = {3, 5, 7, 8, 6, 4, 2, 1, 0};
-    
-        std::string stats_dir = "";
+    std::uint8_t stave_id = 0;
+    int RCVMAP[9] = {3, 5, 7, 8, 6, 4, 2, 1, 0};
 
-        // configuration methods
-        void setup_mosaic(std::string conf_dir);
-        void setup_chips(std::string conf_dir); 
-        void setup_chip_conf(
-            eudaq::Configuration c_conf, 
-            std::uint8_t chip_id);
+    std::string stats_dir = "";
 
-        // bad pixels masking
-        void config_bad_pixels(
-            std::string path);
+    // configuration methods
+    void setup_mosaic(std::string conf_dir);
+    void setup_chips(std::string conf_dir); 
+    void setup_chip_conf(
+        eudaq::Configuration c_conf, 
+        std::uint8_t chip_id);
+
+    // bad pixels masking
+    void config_bad_pixels(
+        std::string path);
 };
 
 class StaveProducer : public eudaq::Producer {

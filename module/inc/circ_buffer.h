@@ -1,5 +1,5 @@
-#ifndef Circ_Buffer_h
-#define Circ_Buffer_h
+#ifndef CircBuffer_h
+#define CircBuffer_h
 
 #include <iostream>
 #include <vector>
@@ -77,6 +77,12 @@ class circ_buffer {
                 return data;
             }
         }
+
+        // return current position of the pointer
+        typename std::vector<T>::iterator ptr_position() {
+            return buffer.begin() + read_p;
+        }
+
         // increment read pointer by n
         // and decrease r/w distance by n
         void inc_read(unsigned int n) {

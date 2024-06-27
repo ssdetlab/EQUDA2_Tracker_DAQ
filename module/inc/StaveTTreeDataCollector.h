@@ -1,4 +1,6 @@
-#pragma once
+#ifndef StaveTTreeDataCollector_h
+#define StaveTTreeDataCollector_h
+
 #include "eudaq/DataCollector.hh"
 
 #include "DetectorEvent.h"
@@ -10,11 +12,8 @@
 #include "AlpideDecoder.h"
 #include "BoardDecoder.h"
 
-#include <set>
+#include <unordered_map>
 #include <omp.h>
-
-#ifndef StaveTTreeDataCollector_h
-#define StaveTTreeDataCollector_h
 
 class StaveTTreeDataCollector : public eudaq::DataCollector {
     public:
@@ -32,10 +31,17 @@ class StaveTTreeDataCollector : public eudaq::DataCollector {
         int min_ev_to_dump;
         int min_staves;
 
-        // error packet counters
+        // MOSAIC-level error counters
+        int end_of_run;
+        int overflow;
+        int timeout;
         int header_error;
-        int errors8b10b;
-        int oversize_error;
+        int decoder_10b8b_error;
+        int event_oversize_error;
+
+        // ALPIDE-level error counters
+        int n_corrupted_chip;
+        int prio_errs;
 
         // to dump data to
         std::shared_ptr<TFile> tree_file;
@@ -46,7 +52,11 @@ class StaveTTreeDataCollector : public eudaq::DataCollector {
 
         // buffers to temporary store data and sync chip events 
         // and to keep track of the insertion order
-        std::map<std::uint32_t,std::map<std::uint8_t,std::vector<chip_event>>> temp_chip_ev_buffer;
+        std::unordered_map<
+            std::uint32_t,
+            std::unordered_map<
+                std::uint8_t,
+                std::vector<chip_event>>> temp_chip_ev_buffer;
         std::shared_ptr<circ_buffer<std::uint32_t>> ev_ins_ord;  
 
         // online monitor protection
