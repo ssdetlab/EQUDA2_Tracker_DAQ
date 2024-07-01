@@ -1,5 +1,4 @@
 #include "AlpideDecoder.h"
-#include "Common.h"
 #include <iostream>
 #include <stdint.h>
 
@@ -113,7 +112,6 @@ bool AlpideDecoder::DecodeDataWord(unsigned char *data, int chip, int region,
                 << address << " twice." << std::endl;
       prioErrors++;
       hit.address = address;
-      if (stuck && !(common::PixelAlreadyHit(stuck, hit))) stuck->push_back(hit);
     }
     else if ((hit.region == hits->back().region) && (hit.dcol == hits->back().dcol) &&
              (address < hits->back().address)) {
@@ -123,7 +121,6 @@ bool AlpideDecoder::DecodeDataWord(unsigned char *data, int chip, int region,
                 << ") in same double column." << std::endl;
       prioErrors++;
       hit.address = address;
-      if (stuck && !(common::PixelAlreadyHit(stuck, hit))) stuck->push_back(hit);
     }
   }
 

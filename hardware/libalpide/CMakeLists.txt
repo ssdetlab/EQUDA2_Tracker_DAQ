@@ -3,25 +3,13 @@ set(BASE_OBJS
   ../src/AlpideDebug.cpp
   ../src/AlpideDecoder.cpp
   ../src/BoardDecoder.cpp
-  ../src/Common.cpp
-  ../src/SetupHelpers.cpp
   ../src/TAlpide.cpp
   ../src/TBoardConfig.cpp
-  ../src/TBoardConfigDAQ.cpp
   ../src/TBoardConfigMOSAIC.cpp
   ../src/TChipConfig.cpp
   ../src/TConfig.cpp
-  ../src/THIC.cpp
-  ../src/THicConfig.cpp
-  ../src/THisto.cpp
-  ../src/TPowerBoard.cpp
-  ../src/TPowerBoardConfig.cpp
   ../src/TReadoutBoard.cpp
-  ../src/TReadoutBoardDAQ.cpp
   ../src/TReadoutBoardMOSAIC.cpp
-  ../src/TestBeamTools.cpp
-  ../src/USB.cpp
-  ../src/USBHelpers.cpp
 )
 
 set(MOSAIC_OBJS
@@ -34,8 +22,8 @@ set(MOSAIC_OBJS
 
 add_library(alpide SHARED ${BASE_OBJS} ${MOSAIC_OBJS})
 target_include_directories(alpide
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
-  PUBLIC ../inc ../MosaicSrc .. # .. is for ReadoutUnitSrc
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
+    PUBLIC ../inc ../MosaicSrc .. # .. is for ReadoutUnitSrc
 )
 target_link_libraries(alpide mosaic powerboard scopecontrol usb-1.0 tinyxml pthread)
 
@@ -44,5 +32,5 @@ target_include_directories(alpide PUBLIC ${ROOT_INCLUDE_DIRS})
 target_link_libraries(alpide ${ROOT_LIBRARIES} pthread)
 
 install(TARGETS alpide
-        LIBRARY DESTINATION lib
+    LIBRARY DESTINATION lib
 )

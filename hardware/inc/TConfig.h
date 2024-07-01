@@ -3,15 +3,30 @@
 
 #include "TBoardConfig.h"
 #include "TChipConfig.h"
-#include "THicConfig.h"
-#include "TPowerBoardConfig.h"
-#include "TScanConfig.h"
 #include <string>
 #include <vector>
 
 const int DEFAULT_MODULE_ID = 1;
 
 class TChipConfig;
+
+enum TDeviceType {
+    TYPE_CHIP,
+    TYPE_TELESCOPE,
+    TYPE_OBHIC,
+    TYPE_IBHIC,
+    TYPE_CHIP_MOSAIC,
+    TYPE_HALFSTAVE,
+    TYPE_HALFSTAVERU,
+    TYPE_MLHALFSTAVE,
+    TYPE_MLSTAVE,
+    TYPE_IBHICRU,
+    TYPE_ENDURANCE,
+    TYPE_POWER,
+    TYPE_UNKNOWN
+};
+
+class TScanConfig {};
 
 class TConfig {
 public:
@@ -22,7 +37,6 @@ public:
     TDeviceType        GetDeviceType(){ return fDeviceType; };
     unsigned int       GetNChips()    { return fChipConfigs.size(); };
     unsigned int       GetNBoards()   { return fBoardConfigs.size(); };
-    unsigned int       GetNHics()     { return fHicConfigs.size(); };
 
     bool               GetUsePowerBoard()          { return false; };
     void               SetUsePowerBoard(bool UsePB){ fUsePowerBoard = UsePB; };
@@ -30,11 +44,8 @@ public:
     TChipConfig*       GetChipConfig(unsigned int iChip);
     TChipConfig*       GetChipConfigById(int chipId);
     TBoardConfig*      GetBoardConfig(unsigned int iBoard);
-    TPowerBoardConfig* GetPBConfig(unsigned int iBoard);
-    THicConfig*        GetHicConfig(unsigned int iHic);
-    THicConfig*        GetHicConfigById(int modId);
     
-    TScanConfig*       GetScanConfig(){ return fScanConfig; };
+    TScanConfig*       GetScanConfig(){ return nullptr; };
     void               WriteToFile(const char *fName);
 
     std::string GetSoftwareVersion();
@@ -42,11 +53,9 @@ public:
   private:
     std::vector<TBoardConfig*>       fBoardConfigs;
     std::vector<TChipConfig*>        fChipConfigs;
-    std::vector<THicConfig*>         fHicConfigs;
     TDeviceType                      fDeviceType;
     
     bool                             fUsePowerBoard;
-    std::vector<TPowerBoardConfig*>  fPBConfigs;
     TScanConfig*                     fScanConfig;
 
     void        ReadConfigFile(const char *fName);

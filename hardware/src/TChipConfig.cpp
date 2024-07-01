@@ -1,6 +1,5 @@
 #include "TChipConfig.h"
 #include "TAlpide.h"
-#include "THIC.h"
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
@@ -176,10 +175,6 @@ bool TChipConfig::IsEnabled() const {
 
 
 bool TChipConfig::IsEnabledWithBB() const {
-    THic *hic = fChip->GetHic();
-    if (hic && !hic->BiasChannelEnabled()) {
-        return false;
-    }
     return (fEnabled != 0) && (fEnabledWithBB != 0);
 }
 

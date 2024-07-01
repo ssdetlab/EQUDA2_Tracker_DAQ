@@ -1,8 +1,5 @@
 #include "TConfig.h"
-#include "TBoardConfigDAQ.h"
 #include "TBoardConfigMOSAIC.h"
-#include "TBoardConfigRU.h"
-#include "TPowerBoardConfig.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -37,18 +34,7 @@ TConfig::TConfig(int chipId, TBoardType boardType) {
 
 void TConfig::Init(int nBoards, std::vector<int> chipIds, TBoardType boardType) {
     for (int iboard = 0; iboard < nBoards; iboard++) {
-        if (boardType == boardDAQ) {
-            fBoardConfigs.push_back(new TBoardConfigDAQ());
-        }
-        else if (boardType == boardMOSAIC) {
-            fBoardConfigs.push_back(new TBoardConfigMOSAIC());
-            if (fUsePowerBoard) {
-                fPBConfigs.push_back(new TPowerBoardConfig(NULL));
-            }
-        }
-        else {
-            std::cout << "TConfig: Unknown board type" << std::endl;
-        }
+        fBoardConfigs.push_back(new TBoardConfigMOSAIC());
     }
     for (unsigned int ichip = 0; ichip < chipIds.size(); ichip++) {
         fChipConfigs.push_back(new TChipConfig(this, chipIds.at(ichip)));
@@ -56,21 +42,8 @@ void TConfig::Init(int nBoards, std::vector<int> chipIds, TBoardType boardType) 
 }
 
 void TConfig::Init(int chipId, TBoardType boardType) {
-    if (boardType == boardDAQ) {
-        fDeviceType = TYPE_CHIP;
-        fBoardConfigs.push_back(new TBoardConfigDAQ());
-    }
-    else if (boardType == boardMOSAIC) {
-        fDeviceType = TYPE_CHIP_MOSAIC;
-        fBoardConfigs.push_back(new TBoardConfigMOSAIC());
-        if (fUsePowerBoard) {
-            fPBConfigs.push_back(new TPowerBoardConfig(NULL));
-        }
-    }
-    else {
-        fDeviceType = TYPE_UNKNOWN;
-        std::cout << "TConfig: Unknown board type" << std::endl;
-    }
+    fDeviceType = TYPE_CHIP_MOSAIC;
+    fBoardConfigs.push_back(new TBoardConfigMOSAIC());
     
     fChipConfigs.push_back(new TChipConfig(this, chipId));
 }
@@ -101,35 +74,6 @@ TBoardConfig *TConfig::GetBoardConfig(unsigned int iBoard) {
         return fBoardConfigs.at(iBoard);
     }
     else { // throw exception
-        return 0;
-    }
-}
-
-TPowerBoardConfig *TConfig::GetPBConfig(unsigned int iBoard) {
-    if (iBoard < fPBConfigs.size()) {
-        return fPBConfigs.at(iBoard);
-    }
-    else { // throw exception
-        return 0;
-    }
-}
-
-THicConfig *TConfig::GetHicConfigById(int modId) {
-    for (unsigned int i = 0; i < fHicConfigs.size(); i++) {
-        if (fHicConfigs.at(i)->GetModId() == modId) {
-            return fHicConfigs.at(i);
-        }
-    }
-    // throw exception here.
-    std::cout << "HIC id " << modId << " not found" << std::endl;
-    return 0;
-}
-
-THicConfig *TConfig::GetHicConfig(unsigned int iHic) {
-    if (iHic < fHicConfigs.size()) {
-        return fHicConfigs.at(iHic);
-    }
-    else {
         return 0;
     }
 }
@@ -250,14 +194,12 @@ void TConfig::SetDeviceType(TDeviceType AType, int NChips) {
         Init(2, chipIds, boardMOSAIC);
     }
     else if (AType == TYPE_IBHIC) {
-        fHicConfigs.push_back(new THicConfigIB(this));
         for (int i = 8; i >= 0; i--) {
             chipIds.push_back(i);
         }
         Init(1, chipIds, boardMOSAIC);
     }
     else if (AType == TYPE_IBHICRU) {
-        fHicConfigs.push_back(new THicConfigIB(this));
         for (int i = 8; i >= 0; i--) {
             chipIds.push_back(i);
         }
@@ -268,7 +210,6 @@ void TConfig::SetDeviceType(TDeviceType AType, int NChips) {
         // in case of half stave NChips contains number of modules
         for (int imod = 1; imod <= NChips; imod++) {
             int modId = (imod & 0x7);
-            fHicConfigs.push_back(new THicConfigOB(this, modId));
             for (int i = 0; i < 15; i++) {
                 if (i == 7) {
                     continue;
@@ -418,15 +359,12 @@ void TConfig::DecodeLine(std::string Line) {
         BoardStart = 0;
         BoardStop  = fBoardConfigs.size();
         HicStart   = 0;
-        HicStop    = fHicConfigs.size();
     }
     else {
         ChipStart  = (Index < (int)fChipConfigs.size()) ? Index : -1;
         ChipStop   = (Index < (int)fChipConfigs.size()) ? Index + 1 : -1;
         BoardStart = (Index < (int)fBoardConfigs.size()) ? Index : -1;
         BoardStop  = (Index < (int)fBoardConfigs.size()) ? Index + 1 : -1;
-        HicStart   = (Index < (int)fHicConfigs.size()) ? Index : -1;
-        HicStop    = (Index < (int)fHicConfigs.size()) ? Index + 1 : -1;
     }
 
     // Todo: correctly handle the number of readout boards
@@ -443,26 +381,11 @@ void TConfig::DecodeLine(std::string Line) {
             fBoardConfigs.at(i)->SetParamValue(Param, Value);
         }
     }
-    else if ((fHicConfigs.size() > 0) && (fHicConfigs.at(0)->IsParameter(Param))) {
-        for (int i = HicStart; i < HicStop; i++) {
-            fHicConfigs.at(i)->SetParamValue(Param, Value);
-        }
-    }
     else if (BoardStart >= 0 && Param.compare("ADDRESS") == 0) {
         for (int i = BoardStart; i < BoardStop; i++) {
             if (fBoardConfigs.at(BoardStart)->GetBoardType() == boardMOSAIC) {
                 ((TBoardConfigMOSAIC *)fBoardConfigs.at(i))->SetIPaddress(Value.c_str());
             }
-            else if (fBoardConfigs.at(BoardStart)->GetBoardType() == boardDAQ) {
-                if (Value.find('.') == std::string::npos) {
-                    ((TBoardConfigDAQ *)fBoardConfigs.at(i))->SetBoardAddress(std::stoi(Value));
-                }
-            }
-        }
-    }
-    else if ((fPBConfigs.size() > 0) && (fPBConfigs.at(0)->IsParameter(Param))) {
-        for (int i = BoardStart; i < BoardStop; i++) {
-            fPBConfigs.at(i)->SetParamValue(Param, Value);
         }
     }
     else {

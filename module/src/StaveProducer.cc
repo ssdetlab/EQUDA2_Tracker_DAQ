@@ -1,7 +1,5 @@
 #include "StaveProducer.h"
 #include <fstream>
-#include "TPowerBoard.h"
-#include "THIC.h"
 #include <unordered_map>
 
 #include "json/writer.h"
