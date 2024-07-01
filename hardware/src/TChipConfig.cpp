@@ -16,7 +16,6 @@ TChipConfig::TChipConfig(TConfig *config, int chipId, const char *fName) {
     fReceiver          = -1;
     fControlInterface  = -1;
     
-    ClearNoisyPixels();
     // fill default values from header file
     fVCASN   = VCASN;
     fVCASN2  = VCASN2;
@@ -63,10 +62,6 @@ TChipConfig::TChipConfig(TConfig *config, int chipId, const char *fName) {
     fScanThrIthr = SCAN_THR_ITHR;
     fScanThrDv   = SCAN_THR_DV;
     fScanFhr     = SCAN_FHR;
-
-    if (fName) {
-        // read information from file
-    }
 
     for (unsigned int ireg = 0; ireg < 32; ++ireg) {
         fDoubleColumnMask[ireg] = 0x0;
@@ -143,7 +138,7 @@ void TChipConfig::InitParamMap() {
     fSettings["DTUDRIVER"]   = &fDtuDriver;
     fSettings["DTUPREEMP"]   = &fDtuPreemp;
     fSettings["DCTRLDRIVER"] = &fDctrlDriver;
-    
+
     // Scans
     fSettings["SCAN_THR_ITHR"] = &fScanThrIthr;
     fSettings["SCAN_THR_DV"]   = &fScanThrDv;

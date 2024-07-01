@@ -1,28 +1,26 @@
 #include "StaveTTreeDataCollector.h"
 #include "TLUPayloadDecoder.h"
-#include <fstream>
 
-// TODO:: take into account EndOfEvent
-//        flag when syncronizing stave
-//        data
+#include <fstream>
+#include <chrono>
 
 void StaveTTreeDataCollector::DoConfigure() {
     auto conf = GetConfiguration();
     
     // set ROOT tree parameters
-    std::string file_tree_path = conf->Get("TTREE_DATA_PATH", "tree.root");
-    std::string tree_name = conf->Get("TTREE_NAME", "MyTree");
-    int buf_size  = conf->Get("BUF_SIZE",  32000);
-    int split_lvl = conf->Get("SPLIT_LVL", 0);
-    
-    online = conf->Get("ONLINE_MONITOR", false);
+    file_tree_path = conf->Get("TTREE_DATA_PATH", "tree.root");
+    tree_name = conf->Get("TTREE_NAME", "MyTree");
+    buf_size  = conf->Get("BUF_SIZE",  32000);
+    split_lvl = conf->Get("SPLIT_LVL", 0);
 
-    // initialize ROOT file and tree
-    tree_file = std::make_shared<TFile>(file_tree_path.c_str(), "recreate");
-    data_tree = std::make_shared<TTree>(tree_name.c_str(), tree_name.c_str());
-    
-    data_tree->Branch("event", &det_ev, buf_size, split_lvl);
-    
+    // for ROOT file and tree initializaiton
+    data_limit = conf->Get("FILE_SWITCH_LIMIT", 1000);
+    date_time_format = conf->Get("DATE_TIME_FORMAT", "_%m_%d_%Y_%H:%M:%S");
+
+    std::cout << "\n\n\n" << std::endl;
+    std::cout << data_limit << std::endl;
+    std::cout << "\n\n\n" << std::endl;
+
     // set number of active boards, cut on minimal 
     // amount of events tp dump into the tree and 
     // minimal number of planes involved into an 
@@ -34,19 +32,55 @@ void StaveTTreeDataCollector::DoConfigure() {
     // of the insertion order
     ev_ins_ord = std::make_shared<circ_buffer<std::uint32_t>>(n_staves*min_ev_to_dump*2);
     
-    // initiazlize MOSAIC error frame counters 
-    end_of_run           = 0;
-    overflow             = 0;
-    timeout              = 0;
-    header_error         = 0;
-    decoder_10b8b_error  = 0;
-    event_oversize_error = 0;
-
-    // initiazlize ALPIDE error frame counters 
-    n_corrupted_chip = 0;
-    prio_errs        = 0;
-
     configured = true;
+}
+
+void StaveTTreeDataCollector::DoStartRun() {
+    // prepare the ROOT file and the tree
+    PrepareFileTree();
+}
+
+void StaveTTreeDataCollector::PrepareFileTree() {
+    // check the cirrent time and 
+    // format it for the file naming
+    auto now = std::chrono::system_clock::now();
+
+    time_t time
+        = std::chrono::system_clock::to_time_t(now);
+    tm* timeinfo = localtime(&time);
+    char buffer[70];
+    strftime(buffer, sizeof(buffer), date_time_format.c_str(),
+        timeinfo);
+
+    std::string formatted_time = buffer;
+
+    std::string file_path = file_tree_path; 
+    file_path.insert(file_path.find_last_of('.'), formatted_time);
+
+    // Set up the file and the tree
+    tree_file = std::make_shared<TFile>(file_path.c_str(), "recreate");
+    data_tree = std::make_shared<TTree>(tree_name.c_str(), tree_name.c_str());
+
+    data_tree->Branch("event", &det_ev, buf_size, split_lvl);
+}
+
+void StaveTTreeDataCollector::DumpFile() {
+    std::vector<stave_event> st_ev_buff;
+    for (auto& [id,stevs] : temp_chip_ev_buffer) {
+        for (auto& stev : stevs) {
+            stave_event st_ev;
+            st_ev.trg_n = id;
+            st_ev.stave_id = stev.first;
+            st_ev.ch_ev_buffer = stev.second;
+            st_ev_buff.push_back(st_ev); 
+        }
+        det_ev.st_ev_buffer = st_ev_buff;
+    
+        data_tree->Fill();
+    }
+
+    data_tree->Write();
+    tree_file->Close();
 }
 
 void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP ev) {
@@ -62,7 +96,7 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
 
     // distribute frame decoding between several threads
     #pragma omp parallel for num_threads(block.size()/MAX_EVENT_SIZE)
-    for (int i = 0; i < block.size()/MAX_EVENT_SIZE; i ++) {
+    for (int i = 0; i < block.size()/MAX_EVENT_SIZE; i++) {
         chip_event ch_ev;
 
         // each chip frame is in a separate 
@@ -94,31 +128,13 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
         ch_ev.event_oversize_error = board_info.eventOverSizeError;
 
         // check for bad frame 
-        bool bad_mosaic = false;
-        if (board_info.overflow) {
-            end_of_run++;
-            bad_mosaic = true;
-        }
-        if (board_info.endOfRun) {
-            overflow++;
-            bad_mosaic = true;
-        }
-        if (board_info.timeout) {
-            timeout++;
-            bad_mosaic = true;
-        }
-        if (board_info.headerError) {
-            header_error++;
-            bad_mosaic = true;
-        }
-        if (board_info.decoder10b8bError) {
-            decoder_10b8b_error++;
-            bad_mosaic = true;
-        }
-        if (board_info.eventOverSizeError) {
-            event_oversize_error++;
-            bad_mosaic = true;
-        }
+        bool bad_mosaic = 
+            board_info.overflow ||
+            board_info.endOfRun ||
+            board_info.timeout ||
+            board_info.headerError ||
+            board_info.decoder10b8bError ||
+            board_info.eventOverSizeError;
 
         // decode Chip event
         int n_bytes_chipevent = 
@@ -134,12 +150,7 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
                 buffer + n_bytes_header, n_bytes_chipevent, &hits, st_id,
                 board_info.channel, prio_err, alpide_flags, 40000000, 
                 nullptr, nullptr, &bc_counter);
-        // check event corruption (second condition -- BUSY VIOLATION)
-        if (!not_corrrupted || (alpide_flags&0x8) == 1) {
-            prio_errs += prio_err;
-            n_corrupted_chip++;
-            continue;
-        }
+
         // convert hits to a more convenient
         // data structure
         if (hits.size() == 0) {
@@ -147,9 +158,10 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
         }
         ch_ev.chip_id = hits[0].chipId;
         ch_ev.channel = hits[0].channel;
+
         // decode region->double_column->address
         // data structure into a hit-map
-        if (!bad_mosaic) {
+        if (!bad_mosaic && not_corrrupted & (alpide_flags&0x8) != 1) {
             for (auto hit : hits) {
                 std::uint16_t rem = hit.address % 4;
                 if (rem == 0 || rem == 3) {
@@ -177,6 +189,10 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
             ev->SetTriggerN(bc_counter);
         }
     }
+    
+    // currently the best option,
+    // given that no trigger ID is 
+    // supplied yet
     ev_ins_ord->write(ev->GetTriggerN());
 
     // if event queue is read out and we've reached minimal event
@@ -206,13 +222,6 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
             
             data_tree->Fill();
         
-            // the safest way to update 
-            // the file in the online mode
-            if (online) { 
-                std::unique_lock<std::mutex> lock(online_mtx);
-                tree_file->Write(0, TObject::kWriteDelete);
-            }
-        
             // clean buffer from dumped events
             temp_chip_ev_buffer.erase(id);
         }
@@ -221,50 +230,36 @@ void StaveTTreeDataCollector::DoReceive(eudaq::ConnectionSPC idx, eudaq::EventSP
         // dumped events trigger ids
         ev_ins_ord->inc_read(coff);
     }
+    
     // increase buffer size if we've reached "dangerous" point
     // (useful for high event rates)
     if (ev_ins_ord->get_distance() == 
         static_cast<std::uint32_t>(ev_ins_ord->size()/2.)) { 
             ev_ins_ord->resize(ev_ins_ord->size());
     }
-    WriteEvent(std::move(ev));
-}
 
-void StaveTTreeDataCollector::DoStopRun() {
-    std::vector<stave_event> st_ev_buff;
-    for (auto& [id,stevs] : temp_chip_ev_buffer) {
-        for (auto& stev : stevs) {
-            stave_event st_ev;
-            st_ev.trg_n = id;
-            st_ev.stave_id = stev.first;
-            st_ev.ch_ev_buffer = stev.second;
-            st_ev_buff.push_back(st_ev); 
-        }
-        det_ev.st_ev_buffer = st_ev_buff;
-    
-        data_tree->Fill();
-    
-        // the safest (?) way to update 
-        // the file in the online mode
-        if (online) { 
-            data_tree->Write();
-            tree_file->SaveSelf();
-        }
+    // send event to the monitor 
+    SendEvent(std::move(ev));
+
+    // Dump the data, save the file,
+    // and switch to the next one 
+    // if the size limit is reached
+    std::cout << tree_file->GetBytesWritten()/1000000. << " > " << data_limit << std::endl;
+    if (tree_file->GetBytesWritten()/1000000. > data_limit) {
+        DumpFile();
+        PrepareFileTree();
     }
 }
 
+void StaveTTreeDataCollector::DoStopRun() {
+    // Dump the rest of the data
+    DumpFile();
+}
+
 void StaveTTreeDataCollector::DoReset() {
-    if (configured) {
-        data_tree->Write();
-        tree_file->Close();
-    } 
     configured = false;
 }
 
 void StaveTTreeDataCollector::DoTerminate() {
-    if (configured) {
-        data_tree->Write();
-        tree_file->Close();
-    } 
     configured = false;
 }

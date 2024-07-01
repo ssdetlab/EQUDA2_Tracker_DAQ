@@ -1,8 +1,6 @@
 #include "StaveROOTMonitor.h"
 #include "TLUPayloadDecoder.h"
 
-// TODO:: proper initialization. Now chip_id-unsafe
-
 void StaveROOTMonitor::AtConfiguration(){
     auto conf = GetConfiguration();
   
@@ -41,9 +39,23 @@ void StaveROOTMonitor::AtConfiguration(){
             m_monitor->SetDrawOptions(pix_grid[i][j], "colz");
         }
     }
+
+    // initiazlize MOSAIC error frame counters 
+    end_of_run           = 0;
+    overflow             = 0;
+    timeout              = 0;
+    header_error         = 0;
+    decoder_10b8b_error  = 0;
+    event_oversize_error = 0;
+
+    // initiazlize ALPIDE error frame counters 
+    n_corrupted_chip = 0;
+    prio_errs        = 0;
 }
 
 void StaveROOTMonitor::AtEventReception(eudaq::EventSP ev){
+    std::cout << "Received " << ev->GetTriggerN() << std::endl;
+
     if (ev->GetDescription() == "TluRawDataEvent") {
         return;
     }
@@ -143,6 +155,7 @@ void StaveROOTMonitor::AtEventReception(eudaq::EventSP ev){
             }
             int pix_x = hit.region*32 + hit.dcol*2 + rem;
             int pix_y = hit.address/2;
+            // std::cout << "pix_x = " << pix_x << "pix_y = " << pix_y << std::endl;
             #pragma omp critical
             {
                 pix_grid[st_id][chip_id]->Fill(pix_x, pix_y);

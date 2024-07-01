@@ -51,10 +51,10 @@ namespace ChipConfig { // to avoid clashes with other configs (e.g. for STROBE_D
     const int STROBE_DURATION = 80;   // 2 us
     
     // FROMU configuration register 3
-    const int STROBE_GAP      = 4000; // .1 ms
+    const int STROBE_GAP = 4000; // .1 ms
     
     // FROMU pulsing register 1
-    const int STROBE_DELAY    = 20;   // 500 ns
+    const int STROBE_DELAY = 20;   // 500 ns
     
     // FROMU pulsing register 2
     const int PULSE_DURATION  = 500; // 12.5 us
@@ -144,11 +144,6 @@ class TChipConfig {
         fDisableManchester = (ADisableManchester) ? 1 : 0;
         };
     
-        void                 SetMaskFile(const char *fName)            { strcpy(fMaskFile, fName); };
-        void                 SetNoisyPixels(std::vector<TPixHit> noisy){ m_noisyPixels = noisy; };
-        void                 ClearNoisyPixels()                        { m_noisyPixels.clear(); };
-        std::vector<TPixHit> GetNoisyPixels()                          { return m_noisyPixels; };
-    
         void         SetDoubleColumnMask(unsigned int dcol, bool mask = true);
         unsigned int GetDoubleColumnMask(unsigned int region);
     
@@ -157,9 +152,9 @@ class TChipConfig {
         bool ScanFakeHitRate() { return (bool)fScanFhr; };
 
     private:
-        std::map<std::string, int *> fSettings;
-        TConfig *                    fConfig;
-        TAlpide *                    fChip;
+        std::map<std::string,int*> fSettings;
+        TConfig *                  fConfig;
+        TAlpide *                  fChip;
         
         // genera;
         int fChipId;
@@ -208,27 +203,29 @@ class TChipConfig {
         int fStrobeDelay;  // delay from pulse to strobe if generated internally
         int fStrobeGap;    // gap between subsequent strobes in sequencer mode
         int fPulseDuration;
+        
         // Buffer current settings
         int fDclkReceiver;
         int fDclkDriver;
         int fMclkReceiver;
         int fDctrlReceiver;
         int fDctrlDriver;
+
         // CMU / DMU settings
         int fPreviousId;
         int fInitialToken;
         int fDisableManchester;
         int fEnableDdr;
+        
         // DTU settings
         int fPllPhase;
         int fPllStages;
         int fChargePump;
         int fDtuDriver;
         int fDtuPreemp;
+        
         // Mask file
-        char                 fMaskFile[200];
-        std::vector<TPixHit> m_noisyPixels;
-        unsigned int         fDoubleColumnMask[32];
+        unsigned int fDoubleColumnMask[32];
     
         // Scans
         int fScanThrIthr;

@@ -4,8 +4,7 @@
 #include <cstring>
 #include <thread>
 
-THic::THic(const char *id, int modId, TPowerBoard *pb, int pbMod, int bbChannel)
-{
+THic::THic(const char *id, int modId, TPowerBoard *pb, int pbMod, int bbChannel) {
   m_dbId.assign(id);
 
   m_powerBoard = pb;
@@ -333,48 +332,50 @@ void THic::AddClassification(THicClassification aClass, bool backBias)
 
 THicClassification THic::GetClassification()
 {
-  // set ABORTED to RED
-  if (m_worstScanNoBB == CLASS_ABORTED) m_worstScanNoBB = CLASS_RED;
-  if (m_worstScanBB == CLASS_ABORTED) m_worstScanBB = CLASS_RED;
+//   // set ABORTED to RED
+//   if (m_worstScanNoBB == CLASS_ABORTED) m_worstScanNoBB = CLASS_RED;
+//   if (m_worstScanBB == CLASS_ABORTED) m_worstScanBB = CLASS_RED;
 
-  // Class RED: more than 2 non-working chips or worst no BB scan RED
-  if (m_chips.size() - GetNEnabledChips() > 2) return CLASS_RED;
+//   // Class RED: more than 2 non-working chips or worst no BB scan RED
+//   if (m_chips.size() - GetNEnabledChips() > 2) return CLASS_RED;
 
-  if (m_worstScanNoBB == CLASS_RED) return CLASS_RED;
+//   if (m_worstScanNoBB == CLASS_RED) return CLASS_RED;
 
-  // Class No back bias and No back bias, cat B
-  if ((m_worstScanBB == CLASS_RED) || (GetNEnabledChipsWithBB() < GetNEnabledChipsNoBB())) {
-    if (m_chips.size() > GetNEnabledChips())
-      return Worst(m_oldClass, CLASS_NOBBB);
-    else if (m_worstScanNoBB <= CLASS_BRONZE)
-      return Worst(m_oldClass, CLASS_NOBB);
-    else {
-      std::cout << "Warning: unconsidered case 1 in HIC classification" << std::endl;
-      return CLASS_UNTESTED;
-    }
-  }
+//   // Class No back bias and No back bias, cat B
+//   if ((m_worstScanBB == CLASS_RED) || (GetNEnabledChipsWithBB() < GetNEnabledChipsNoBB())) {
+    // if (m_chips.size() > GetNEnabledChips())
+    //   return Worst(m_oldClass, CLASS_NOBBB);
+    // else if (m_worstScanNoBB <= CLASS_BRONZE)
+    //   return Worst(m_oldClass, CLASS_NOBB);
+    // else {
+    //   std::cout << "Warning: unconsidered case 1 in HIC classification" << std::endl;
+    //   return CLASS_UNTESTED;
+    // }
+//   }
 
-  // class Partial and Partial, cat B
-  if (m_chips.size() - GetNEnabledChips() > 1) {
-    if (Worst(m_worstScanBB, m_worstScanNoBB) <= CLASS_BRONZE)
-      return Worst(m_oldClass, CLASS_PARTIALB);
-    else {
-      std::cout << "Warning: unconsidered case 2 in HIC classification" << std::endl;
-      return CLASS_UNTESTED;
-    }
-  }
+//   // class Partial and Partial, cat B
+//   if (m_chips.size() - GetNEnabledChips() > 1) {
+    // if (Worst(m_worstScanBB, m_worstScanNoBB) <= CLASS_BRONZE)
+    //   return Worst(m_oldClass, CLASS_PARTIALB);
+    // else {
+    //   std::cout << "Warning: unconsidered case 2 in HIC classification" << std::endl;
+    //   return CLASS_UNTESTED;
+    // }
+//   }
 
-  if (m_chips.size() - GetNEnabledChips() == 1) {
-    if (Worst(m_worstScanBB, m_worstScanNoBB) <= CLASS_BRONZE)
-      return Worst(m_oldClass, CLASS_PARTIAL);
-    else {
-      std::cout << "Warning: unconsidered case 3 in HIC classification" << std::endl;
-      return CLASS_UNTESTED;
-    }
-  }
+//   if (m_chips.size() - GetNEnabledChips() == 1) {
+    // if (Worst(m_worstScanBB, m_worstScanNoBB) <= CLASS_BRONZE)
+    //   return Worst(m_oldClass, CLASS_PARTIAL);
+    // else {
+    //   std::cout << "Warning: unconsidered case 3 in HIC classification" << std::endl;
+    //   return CLASS_UNTESTED;
+    // }
+//   }
 
-  // "trivial" classes
-  return Worst(m_oldClass, Worst(m_worstScanBB, m_worstScanNoBB));
+//   // "trivial" classes
+//   return Worst(m_oldClass, Worst(m_worstScanBB, m_worstScanNoBB));
+
+    return CLASS_UNTESTED;
 }
 
 THicIB::THicIB(const char *dbId, int modId, TPowerBoard *pb, int pbMod, int bbChannel)

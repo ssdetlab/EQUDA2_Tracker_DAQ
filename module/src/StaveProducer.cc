@@ -131,7 +131,7 @@ void StaveController::setup_chip_conf(eudaq::Configuration c_conf, std::uint8_t 
     chip_conf->SetParamValue("DTUDRIVER",   c_conf.Get("DTU_DRIVER",   ChipConfig::DTU_DRIVER));
     chip_conf->SetParamValue("DTUPREEMP",   c_conf.Get("DTU_PREEMP",   ChipConfig::DTU_PREEMP));
     chip_conf->SetParamValue("DCTRLDRIVER", c_conf.Get("DCTRL_DRIVER", ChipConfig::DCTRL_DRIVER));
-    
+
     // Scans
     chip_conf->SetParamValue("SCAN_THR_ITHR", c_conf.Get("SCAN_THR_ITHR", ChipConfig::SCAN_THR_ITHR));
     chip_conf->SetParamValue("SCAN_THR_DV",   c_conf.Get("SCAN_THR_DV",   ChipConfig::SCAN_THR_DV));

@@ -19,6 +19,7 @@ class StaveTTreeDataCollector : public eudaq::DataCollector {
     public:
         using eudaq::DataCollector::DataCollector;
         void DoStopRun()                                           override;
+        void DoStartRun()                                          override;
         void DoConfigure()                                         override;
         void DoReceive(eudaq::ConnectionSPC id, eudaq::EventSP ev) override;
         void DoTerminate()                                         override;
@@ -26,22 +27,20 @@ class StaveTTreeDataCollector : public eudaq::DataCollector {
 
         static const uint32_t m_id_factory = eudaq::cstr2hash("StaveTTreeDataCollector");
     private:
+        void DumpFile();
+        void PrepareFileTree();
+
         // constants for data organization 
         int n_staves;
         int min_ev_to_dump;
         int min_staves;
-
-        // MOSAIC-level error counters
-        int end_of_run;
-        int overflow;
-        int timeout;
-        int header_error;
-        int decoder_10b8b_error;
-        int event_oversize_error;
-
-        // ALPIDE-level error counters
-        int n_corrupted_chip;
-        int prio_errs;
+        
+        int data_limit;
+        std::string date_time_format;
+        std::string file_tree_path;
+        std::string tree_name;
+        int buf_size;
+        int split_lvl;
 
         // to dump data to
         std::shared_ptr<TFile> tree_file;
@@ -59,17 +58,13 @@ class StaveTTreeDataCollector : public eudaq::DataCollector {
                 std::vector<chip_event>>> temp_chip_ev_buffer;
         std::shared_ptr<circ_buffer<std::uint32_t>> ev_ins_ord;  
 
-        // online monitor protection
-        bool online;
-        std::mutex online_mtx;
-
         bool configured = false;
 };
 
 namespace {
     auto dummy0 = eudaq::Factory<eudaq::DataCollector>::
         Register<StaveTTreeDataCollector, const std::string&, const std::string&>
-        (StaveTTreeDataCollector::m_id_factory);
+            (StaveTTreeDataCollector::m_id_factory);
 }
 
 #endif
